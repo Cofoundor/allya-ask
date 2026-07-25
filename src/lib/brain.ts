@@ -101,9 +101,12 @@ export function createBrain(canvas: HTMLCanvasElement, box: HTMLElement, opts: B
 
   const nodes: BrainNode[] = [];
   const nodeById: Record<string, BrainNode> = {};
-  const edges: [string, string][] = [];
+  /** [a, b, isCross] — cross strands draw a shade behind the structural ones */
+  const edges: [string, string, boolean][] = [];
   /** id → neighbour ids, so hover doesn't rescan every edge */
   const adj: Record<string, string[]> = {};
+  /** just the sideways links, so a thought can jump between clusters */
+  const crossAdj: Record<string, string[]> = {};
 
   let pulses: { a: BrainNode; b: BrainNode; delay: number; t: number; dur: number; hit?: boolean }[] = [];
   let ripples: { x: number; y: number; col: string; t: number; r0: number }[] = [];
@@ -124,10 +127,14 @@ export function createBrain(canvas: HTMLCanvasElement, box: HTMLElement, opts: B
     timeouts.add(id);
   }
 
-  function link(a: string, b: string) {
-    edges.push([a, b]);
+  function link(a: string, b: string, cross = false) {
+    edges.push([a, b, cross]);
     (adj[a] ||= []).push(b);
     (adj[b] ||= []).push(a);
+    if (cross) {
+      (crossAdj[a] ||= []).push(b);
+      (crossAdj[b] ||= []).push(a);
+    }
   }
 
   function addNode(spec: NodeSpec) {
@@ -239,6 +246,14 @@ export function createBrain(canvas: HTMLCanvasElement, box: HTMLElement, opts: B
     const path = pathToHub(t);
     for (let i = 0; i < path.length - 1; i++) fireEdge(path[i], path[i + 1], i * 0.16);
     if (path[0]) excite(path[0], 0.5);
+
+    // and often it carries on sideways, into whatever the answer touches —
+    // the reason the cross strands are there at all
+    const sideways = crossAdj[t.id];
+    if (sideways?.length && Math.random() < 0.6) {
+      const other = nodeById[sideways[(Math.random() * sideways.length) | 0]];
+      if (other) fireEdge(t, other, (path.length - 1) * 0.16);
+    }
   }
 
   function bloom() {
@@ -400,19 +415,22 @@ export function createBrain(canvas: HTMLCanvasElement, box: HTMLElement, opts: B
 
     // edges: gradient strands only while lit — a resting edge sits at ~5%
     // alpha, which a flat stroke renders identically for a fraction of the cost
-    for (const [aid, bid] of edges) {
+    for (const [aid, bid, cross] of edges) {
       const a = nodeById[aid];
       const b = nodeById[bid];
       const lit = Math.max(a.ex, b.ex);
+      // it has to read as a web at rest, not as scattered dots — structural
+      // strands carry the shape, cross strands sit a shade behind them
+      const rest = cross ? 0.1 : 0.19;
       if (lit > 0.03) {
         const g = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-        g.addColorStop(0, hexA(GROUPS[a.group] || '#91d45f', 0.05 + a.ex * 0.3 + lit * 0.08));
-        g.addColorStop(1, hexA(GROUPS[b.group] || '#91d45f', 0.05 + b.ex * 0.3 + lit * 0.08));
+        g.addColorStop(0, hexA(GROUPS[a.group] || '#91d45f', rest + a.ex * 0.3 + lit * 0.08));
+        g.addColorStop(1, hexA(GROUPS[b.group] || '#91d45f', rest + b.ex * 0.3 + lit * 0.08));
         ctx.strokeStyle = g;
       } else {
-        ctx.strokeStyle = hexA(GROUPS[a.group] || '#91d45f', 0.05);
+        ctx.strokeStyle = hexA(GROUPS[a.group] || '#91d45f', rest);
       }
-      ctx.lineWidth = (0.8 + lit * 1.2) * S;
+      ctx.lineWidth = ((cross ? 0.6 : 0.85) + lit * 1.2) * S;
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
       ctx.lineTo(b.x, b.y);
@@ -594,7 +612,7 @@ export function createBrain(canvas: HTMLCanvasElement, box: HTMLElement, opts: B
   // seed the graph
   opts.nodes.forEach((spec) => addNode(spec));
   (opts.cross || []).forEach(([a, b]) => {
-    if (nodeById[a] && nodeById[b]) link(a, b);
+    if (nodeById[a] && nodeById[b]) link(a, b, true);
   });
 
   return {

@@ -35,11 +35,34 @@ export const NODES: NodeSpec[] = [
   { id: 'team_story', label: 'Origin', tier: 2, group: 'team', parent: 'team' },
 ];
 
-/* a few strands that skip the hub — the business is not a tree */
+/* Strands that skip the hub — a business is a web, not an org chart.
+
+   The five departments close into a ring, two chords cut across it, and the
+   leaves link to the ones they actually bear on. Most links join neighbouring
+   clusters so the strands stay short; the two long chords are the ones worth
+   drawing a line across the page for. */
 export const CROSS: [string, string][] = [
-  ['product', 'model'],
+  // the ring: every department holds hands with the next
+  ['product', 'market'],
   ['market', 'traction'],
-  ['model', 'traction'],
+  ['traction', 'model'],
+  ['model', 'team'],
+  ['team', 'product'],
+  // and two chords through the middle
+  ['product', 'model'],
+  ['market', 'team'],
+
+  // leaves, to the things they bear on
+  ['product_onboarding', 'market_icp'],
+  ['product_allya', 'team_story'],
+  ['product_experts', 'model_economics'],
+  ['product_agents', 'model_economics'],
+  ['market_rivals', 'traction_proof'],
+  ['market_icp', 'model_gtm'],
+  ['market_tam', 'model_pricing'],
+  ['traction_stage', 'model_economics'],
+  ['traction_roadmap', 'product_allya'],
+  ['team_founders', 'traction_stage'],
 ];
 
 /** tapping a node asks this. Departments included, so every node is live. */
