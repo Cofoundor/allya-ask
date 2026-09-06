@@ -1,10 +1,9 @@
 /* ============================================================
-   The investor room — the deck on the left, the brain in the middle.
+   The investor room — the brain in the middle, the deck on the right.
 
-   Same shape as the Allya workspace at allyafn.netlify.app: a rail, a
-   live brain, the pointers that sit under it, and a composer. Tokens,
-   bubbles, chips and the composer field all come from globals.css so
-   Allya sounds the same here as she does in the product.
+   Same shape as the Allya workspace at allyafn.netlify.app. Tokens,
+   bubbles, chips and the composer field come from globals.css so Allya
+   sounds the same here as she does in the product.
    ============================================================ */
 
 .iv {
@@ -14,6 +13,23 @@
   flex-direction: column;
   background: var(--bg);
 }
+
+/* ---------------- before the room exists ---------------- */
+.iv-center { display: grid; place-items: center; padding: 24px; }
+.iv-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 460px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 22px 24px;
+}
+.iv-panel .group-label { margin: 0; }
+.iv-panel-text { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--fg-soft); }
+.iv-muted { margin: 0; font-size: 12.5px; color: var(--fg-faint); }
 
 /* ---------------- topbar ---------------- */
 .iv-top {
@@ -47,11 +63,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.iv-top-right {
-  display: flex;
-  gap: 8px;
-  flex: none;
-}
+.iv-top-right { display: flex; gap: 8px; flex: none; }
 .iv-ask-chip {
   font-size: 12px;
   color: var(--lime-glow);
@@ -68,165 +80,12 @@
   border-color: var(--hairline);
 }
 
-/* ---------------- the two columns ---------------- */
+/* ---------------- the two columns: brain left, deck right ---------------- */
 .iv-body {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
-}
-
-/* ---------------- left rail: the deck ---------------- */
-.iv-rail {
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--hairline);
-  background: #0c0c0c;
-}
-.iv-rail-head {
-  flex: none;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 16px 18px 8px;
-}
-.iv-rail-head .group-label { margin: 0; }
-.iv-rail-count { font-size: 11px; color: var(--fg-faint); }
-
-.iv-rail-list {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 0 10px 24px;
-}
-
-.iv-slide + .iv-slide { border-top: 1px solid var(--hairline); }
-.iv-slide.is-open {
-  border-top-color: transparent;
-  background: var(--surface);
-  border-radius: 10px;
-  margin: 6px 0;
-}
-.iv-slide.is-open + .iv-slide { border-top-color: transparent; }
-
-.iv-slide-btn {
-  appearance: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 10px 10px;
-  text-align: left;
-  font-family: var(--sans);
-  font-size: 13.5px;
-  color: var(--fg-soft);
-  transition: color var(--dur) var(--ease);
-}
-.iv-slide-btn:hover { color: var(--fg); }
-.iv-slide.is-open .iv-slide-btn { color: var(--fg); font-weight: 500; }
-
-.iv-slide-n {
-  flex: none;
-  font-size: 10.5px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.06em;
-  color: var(--fg-faint);
-  border: 1px solid var(--hairline);
-  border-radius: 5px;
-  padding: 2px 5px;
-}
-.iv-slide.is-open .iv-slide-n {
-  color: var(--lime-glow);
-  border-color: rgba(145, 212, 95, 0.4);
-  background: var(--lime-dim);
-}
-.iv-slide-label { min-width: 0; }
-
-.iv-slide-body {
-  padding: 2px 12px 14px;
-  animation: rise-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.iv-kicker {
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--fg-faint);
-  margin-bottom: 7px;
-}
-.iv-headline {
-  font-family: var(--serif);
-  font-optical-sizing: auto;
-  font-weight: 460;
-  font-size: 17px;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  margin: 0 0 12px;
-  color: var(--fg);
-}
-.iv-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-.iv-stat {
-  flex: 1 1 84px;
-  background: var(--card);
-  border: 1px solid var(--hairline);
-  border-radius: 8px;
-  padding: 7px 9px;
-}
-.iv-stat b {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--lime-glow);
-  letter-spacing: -0.01em;
-}
-.iv-stat span {
-  display: block;
-  font-size: 10.5px;
-  color: var(--fg-faint);
-  margin-top: 2px;
-}
-.iv-lines {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.iv-lines li {
-  position: relative;
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--fg-soft);
-  padding: 4px 0 4px 12px;
-}
-.iv-lines li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 11px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--hairline-strong);
-}
-.iv-say {
-  margin: 12px 0 0;
-  padding-top: 10px;
-  border-top: 1px solid var(--hairline);
-  font-family: var(--serif);
-  font-weight: 420;
-  font-style: italic;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--fg-faint);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
 }
 
 /* ---------------- main column ---------------- */
@@ -249,14 +108,12 @@
   letter-spacing: -0.01em;
   color: var(--fg);
 }
-.iv-greet em { font-style: italic; color: var(--lime-glow); }
 
-/* the brain holds its own height and never scrolls away */
 .iv-brain {
   flex: none;
   position: relative;
   margin: 0 24px;
-  height: clamp(280px, 42vh, 440px);
+  height: clamp(280px, 40vh, 420px);
   border: 1px solid var(--hairline);
   border-radius: 14px;
   background: #0d0d0d;
@@ -321,7 +178,7 @@
   gap: 10px;
   width: 100%;
   text-align: left;
-  padding: 6px 6px;
+  padding: 6px;
   border-radius: 7px;
   font-family: var(--sans);
   font-size: 12.5px;
@@ -356,12 +213,7 @@
   border-bottom: 1px solid var(--hairline);
 }
 .iv-askrow:last-child { border-bottom: none; }
-.iv-askrow b {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--fg);
-  letter-spacing: -0.01em;
-}
+.iv-askrow b { font-size: 14px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
 .iv-askrow span { font-size: 11px; color: var(--fg-faint); text-align: right; }
 
 /* ---------------- the conversation ---------------- */
@@ -372,32 +224,224 @@
 .iv-turn .msg-block { max-width: 88%; }
 .iv-turn .tool { opacity: 1; }
 .iv-turn .tool:hover { color: var(--lime-glow); }
+.bubble.allya.iv-unmatched { border-color: var(--hairline-strong); color: var(--fg-soft); }
+
+/* every question the canvas holds, for anyone not using a mouse */
+.iv-all-q { margin-top: 16px; }
+.iv-all-q summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--fg-faint);
+  padding: 4px 0;
+  list-style: none;
+}
+.iv-all-q summary::-webkit-details-marker { display: none; }
+.iv-all-q summary::before { content: '▸ '; }
+.iv-all-q[open] summary::before { content: '▾ '; }
+.iv-all-q summary:hover { color: var(--fg-soft); }
+.iv-q-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0 2px; }
+.iv-q {
+  appearance: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--fg-soft);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 6px 10px;
+  text-align: left;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.iv-q:hover { color: var(--fg); border-color: var(--hairline-strong); }
 
 /* ---------------- composer ---------------- */
 .iv-composer {
   flex: none;
-  padding: 10px 24px 14px;
+  padding: 10px 24px 16px;
   border-top: 1px solid var(--hairline);
   background: rgba(12, 12, 12, 0.94);
 }
-.iv-hint {
-  margin: 7px 2px 0;
-  font-size: 11px;
+
+/* ---------------- right rail: the deck ---------------- */
+.iv-rail {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--hairline);
+  background: #0c0c0c;
+}
+.iv-rail-head {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 16px 18px 8px;
+}
+.iv-rail-head .group-label { margin: 0; }
+.iv-rail-count { font-size: 11px; color: var(--fg-faint); }
+.iv-rail-error { padding: 0 12px 8px; color: var(--danger); }
+
+.iv-rail-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 10px 24px;
+}
+.iv-rail-group + .iv-rail-group { margin-top: 18px; }
+.iv-rail-group > .group-label { margin: 6px 8px 8px; }
+.iv-group-key { color: var(--lime-glow); }
+
+.iv-slide { border-radius: 10px; }
+.iv-slide.is-open { background: var(--surface); margin: 6px 0; }
+
+/* a featured slide is a card even when closed — that is the showcase */
+.iv-slide.is-showcase {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color var(--dur) var(--ease);
+}
+.iv-slide.is-showcase:hover { border-color: var(--hairline-strong); }
+.iv-slide.is-showcase.is-open { border-color: rgba(145, 212, 95, 0.4); }
+
+.iv-slide-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px;
+  text-align: left;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--fg-soft);
+  transition: color var(--dur) var(--ease);
+}
+.iv-slide-btn:hover { color: var(--fg); }
+.iv-slide.is-open .iv-slide-btn,
+.iv-slide.is-showcase .iv-slide-btn { color: var(--fg); font-weight: 500; }
+.iv-slide.is-showcase .iv-slide-btn { padding-bottom: 4px; }
+
+.iv-slide-n {
+  flex: none;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  color: var(--fg-faint);
+  border: 1px solid var(--hairline);
+  border-radius: 5px;
+  padding: 2px 5px;
+}
+.iv-slide.is-open .iv-slide-n,
+.iv-slide.is-showcase .iv-slide-n {
+  color: var(--lime-glow);
+  border-color: rgba(145, 212, 95, 0.4);
+  background: var(--lime-dim);
+}
+.iv-slide-label { min-width: 0; }
+
+.iv-showcase { cursor: pointer; padding: 0 12px 12px; }
+.iv-feature-note {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.45;
   color: var(--fg-faint);
 }
-.iv-hint b { color: var(--fg-soft); font-weight: 500; }
+
+.iv-slide-body {
+  padding: 2px 12px 14px;
+  animation: rise-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.iv-slide-loading { display: grid; place-items: center; padding: 18px; }
+
+.iv-kicker {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  margin-bottom: 7px;
+}
+.iv-headline {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 460;
+  font-size: 16.5px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--fg);
+}
+.iv-slide-body .iv-headline { margin-bottom: 12px; }
+
+.iv-stats { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.iv-slide-body .iv-stats { margin-bottom: 12px; }
+.iv-stat {
+  flex: 1 1 84px;
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 7px 9px;
+}
+.iv-stat b {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lime-glow);
+  letter-spacing: -0.01em;
+}
+.iv-stat span { display: block; font-size: 10.5px; color: var(--fg-faint); margin-top: 2px; }
+
+.iv-lines { margin: 0; padding: 0; list-style: none; }
+.iv-lines li {
+  position: relative;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--fg-soft);
+  padding: 4px 0 4px 12px;
+}
+.iv-lines li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--hairline-strong);
+}
+.iv-say {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--serif);
+  font-weight: 420;
+  font-style: italic;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--fg-faint);
+}
 
 /* ---------------- narrower screens ---------------- */
 @media (max-width: 1080px) {
   .iv-row { grid-template-columns: minmax(0, 1fr); }
 }
 
-@media (max-width: 860px) {
-  .iv-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+@media (max-width: 900px) {
+  .iv-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
   .iv-rail {
-    border-right: none;
-    border-bottom: 1px solid var(--hairline);
-    max-height: 34vh;
+    border-left: none;
+    border-top: 1px solid var(--hairline);
+    max-height: 38vh;
   }
   .iv-top-mid { display: none; }
   .iv-greet { padding: 14px 16px 10px; font-size: 17px; }

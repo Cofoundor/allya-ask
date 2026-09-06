@@ -1,0 +1,632 @@
+"""In-memory content for the investor room.
+
+Everything the page renders lives here, so the frontend holds none of it.
+Swap this module for a CMS or a database read and the API surface does not move.
+
+Sourced from the ZeroTo10 pitch deck (Aug 2026). The deck's internal reviewer
+notes ("ASK ...", "Needs Sanshat") are deliberately absent: they are gaps
+flagged for the founder, not content for an investor.
+
+PRICING is the single source for the commercial model. The deck still prints
+Rs 2,000/mo; pricing was re-settled on 2 Sep 2026 at Rs 1,000/mo plus credits.
+"""
+
+PRICING = {
+    "platform": "₹1,000",
+    "credit_rate": "1 credit = ₹10",
+    "tier2_floor": "₹5,500",
+    "tier2_run": "₹9,000–12,000",
+    "arpu": "₹35,000",
+}
+
+ROOM = {
+    "company": "ZeroTo10",
+    "stage": "Pre-seed",
+    "tagline": "Ask us anything — before you ask us.",
+    "greeting": "Here's what I know about ZeroTo10 — touch anything and I'll answer it.",
+    "brain_title": "The brain",
+    "brain_subtitle": "every question an investor asks — touch it",
+    "composer_placeholder": "Ask anything — pricing, the moat, the 15%, the raise…",
+    "chips": [
+        {"value": "₹4 Cr", "label": "for 7%"},
+        {"value": "MVP live", "label": ""},
+    ],
+    "metrics": [
+        {"value": "₹4 Cr", "label": "capital raise"},
+        {"value": "7%", "label": "equity offered"},
+        {"value": "₹57 Cr", "label": "post-money"},
+        {"value": "24 mo", "label": "runway at ~₹15 L/mo"},
+        {"value": "85 / 15", "label": "agents / human gate"},
+        {"value": "₹35K", "label": "blended ARPU / yr"},
+    ],
+    "openers": [
+        {"id": "o1", "text": "What is ZeroTo10, in one paragraph?"},
+        {"id": "o2", "text": "What stops a competitor copying this?"},
+        {"id": "o3", "text": "What happens to the human 15% at scale?"},
+        {"id": "o4", "text": "What does ₹4 Cr get you to?"},
+    ],
+    "no_answer_text": (
+        "That one is not in the brain yet — this room answers the questions the deck can back "
+        "with a number or a source, and makes no attempt to bluff the rest.\n\n"
+        "Put it to Sanshat directly and it will be answered properly: **sanshat@zeroto10teams.xyz**\n\n"
+        "In the meantime, the sharpest things in here are the moat, the human 15% at scale, "
+        "and the use of funds."
+    ),
+}
+
+# ---------------------------------------------------------------- the deck
+
+SLIDES = [
+    {
+        "id": "01",
+        "label": "Cover",
+        "kicker": "A brain for your business",
+        "headline": "Allya",
+        "featured": False,
+        "lines": [
+            "The operating brain that remembers your business — then puts agents to work on top of it.",
+            "Pre-Seed · ₹4 Cr",
+        ],
+        "say": "The brain fills the slide. The name sits inside it.",
+    },
+    {
+        "id": "02",
+        "label": "Key numbers",
+        "kicker": "In a nutshell",
+        "headline": "Allya is the brain your business runs on.",
+        "featured": True,
+        "feature_note": "The whole pitch in six numbers",
+        "lines": [
+            "Two things compound, and neither is a feature: the brain gets denser with every decision a business feeds it, and a human signs off before anything ships.",
+            "Competitors ship agents. Nobody ships both.",
+        ],
+        "stats": [
+            {"value": "MVP live", "label": "Product"},
+            {"value": "₹35K", "label": "ARPU / year"},
+            {"value": "₹4 Cr / 7%", "label": "Raise"},
+            {"value": "25", "label": "WTP responses"},
+            {"value": "Bottom-up", "label": "Market sizing"},
+            {"value": "Phased", "label": "GTM rollout"},
+        ],
+        "say": "One-line pitch, then the six numbers.",
+    },
+    {
+        "id": "03",
+        "label": "The problem",
+        "kicker": "The problem",
+        "headline": "Founders don't fail for lack of ideas. They fail in execution.",
+        "featured": False,
+        "lines": [
+            "A solo services founder's real week, once the agency retainer stops making sense:",
+            "MON — Interviewing marketing freelancers, again",
+            "TUE — Chasing an agency for last week's report",
+            "WED — Onboarding an HR contractor from scratch",
+            "THU — Asking ChatGPT the same question a third time",
+            "FRI — Still no campaign live",
+            "Agencies, freelancers, SaaS and chatbots each solve a slice. No tool both thinks and acts.",
+        ],
+        "say": "One founder's real week, not a five-point pain list.",
+    },
+    {
+        "id": "04",
+        "label": "The solution",
+        "kicker": "Our solution",
+        "headline": "The brain first. Agents second.",
+        "featured": False,
+        "lines": [
+            "Allya builds a living model of your business in 3–5 minutes of onboarding — goals, constraints, tone, history.",
+            "Agents are what it reaches for once it already knows what to do.",
+        ],
+        "stats": [
+            {"value": "85%", "label": "executed by agents"},
+            {"value": "15%", "label": "human oversight on top"},
+        ],
+        "say": "Lead with the headline, then point at the brain box.",
+    },
+    {
+        "id": "05",
+        "label": "The product",
+        "kicker": "The brain, in the product",
+        "headline": "Every thought Allya connects about your business, visible while it works.",
+        "featured": False,
+        "lines": [
+            "The brain box — business context, ICP, tone, quarter goal, past campaigns.",
+            "Decide together — discuss the problem, approve the plan. No prompt engineering.",
+            "Work that shipped — the agents execute; the human gate signs off before it leaves.",
+            "The outcome is logged back into the brain.",
+        ],
+        "say": "Walk the product: brain, conversation, shipped work.",
+    },
+    {
+        "id": "06",
+        "label": "How it works",
+        "kicker": "Everything routes through the brain",
+        "headline": "A living model of the business — decisions, documents, tone, history. Denser with every use.",
+        "featured": False,
+        "lines": [
+            "01 — Founder input: onboard, discuss the problem, approve a direction",
+            "02 — The brain decides: the task is planned against everything the business has ever told Allya",
+            "03 — Agents execute: interchangeable hands across HR, Marketing, PR and Sales Ops",
+            "04 — Human QA gate: 15% oversight before anything ships; every correction feeds back",
+            "Not an agency. Not a freelancer marketplace. Not a prompt wrapper. Not a pile of agents you configure.",
+        ],
+        "say": "Agents are interchangeable hands. The brain is the product.",
+    },
+    {
+        "id": "07",
+        "label": "Validation",
+        "kicker": "Early execution, with outcomes attached",
+        "headline": "80% said yes at ₹5–10K per month.",
+        "featured": True,
+        "feature_note": "The demand evidence, and its limits",
+        "lines": [
+            "Mili Khare (dietician) — 28 tasks in 30 days across 3 client tiers; cut lead drop-offs and stabilised monthly revenue.",
+            "SurferSearcher (marketing agency) — repositioned toward US B2B SaaS; 13 outbound campaigns live in month one.",
+            "Dori (q-commerce) — idea validated through customer interviews and prior data; onboarding flows designed.",
+            "Internal dogfooding — ZeroTo10 ran its own TAM sizing, validation process and this deck through Allya.",
+        ],
+        "stats": [
+            {"value": "20+", "label": "founder conversations"},
+            {"value": "25", "label": "willingness-to-pay responses"},
+            {"value": "80%", "label": "yes at ₹5–10K/mo"},
+        ],
+        "say": "Outcome per case, not task counts alone.",
+    },
+    {
+        "id": "08",
+        "label": "Market",
+        "kicker": "India's founder base, filtered down",
+        "headline": "From 22 Cr down to a 1 Lakh beachhead.",
+        "featured": True,
+        "feature_note": "Market size, filtered rather than claimed",
+        "lines": [
+            "Total relevant population — 22 Cr",
+            "Total addressable (TAM) — 15 Cr",
+            "Entrepreneurially relevant — 5.85 Cr",
+            "Serviceable (SAM) — 2 Cr",
+            "SOM — 1 Lakh, 0.05% of SAM",
+            "Entrepreneurial intention ~4.05 Cr (~27%); early-stage activity ~1.8 Cr (~12%); ~30% payment intention lands SAM at ~2 Cr.",
+            "Blended ARPU ~₹35,000/year, so 1 Lakh implies roughly ₹350 Cr of annual revenue at full capture.",
+        ],
+        "stats": [
+            {"value": "15 Cr", "label": "TAM"},
+            {"value": "2 Cr", "label": "SAM"},
+            {"value": "1 Lakh", "label": "SOM"},
+            {"value": "₹350 Cr", "label": "at full capture"},
+        ],
+        "say": "The top-down funnel is scaffolding; the bottom-up 18-month model is the real slide.",
+    },
+    {
+        "id": "09",
+        "label": "Go-to-market",
+        "kicker": "Six months, sequenced by trust",
+        "headline": "Channel order = trust depth × memory lifespan.",
+        "featured": False,
+        "lines": [
+            "M1 Problem ID — reply to problem-led posts on X; learn from founder pain",
+            "M2 Brand building — daily reels, startup communities, affiliates",
+            "M3 Validation — community input shifts focus to demand capture",
+            "M4 Public waitlist — waitlist live; webinars and partnership placements",
+            "M5 Private beta — manual onboarding, close observation, testimonials",
+            "M6 Public launch — countdown across every active channel; launch with proof",
+            "Instagram · YouTube · Twitter/X · Reddit · Email · LinkedIn",
+        ],
+        "say": "The trust-depth sequencing is the most original thinking in the deck.",
+    },
+    {
+        "id": "10",
+        "label": "Business model",
+        "kicker": "Subscription for access, credits for execution",
+        "headline": f"{PRICING['platform']}/month for the platform, credits for the work.",
+        "featured": True,
+        "feature_note": "How the money actually works",
+        "lines": [
+            f"Platform access — {PRICING['platform']}/month. Context store, unlimited asking, LinkedIn drafting and publishing.",
+            f"Serviced tier — {PRICING['platform']}/mo plus a minimum 500 credits/mo. Adds the human 15%, a warm-up slot, campaign execution and a named operator. Floor {PRICING['tier2_floor']}/mo, realistic run rate {PRICING['tier2_run']}/mo.",
+            f"Credits: {PRICING['credit_rate']}, sold as prepaid packs of 300 / 800 / 2,000. Credits never expire.",
+            "The menu covers only what exists — LinkedIn post human-checked 40 / auto 15; warm-up 150 per domain per month; lead list 200 per 100 leads; email campaign 300 (150 contacts) or 800 (500 contacts); reply triage 150 per 100 replies.",
+            "First month free is honoured as free platform plus 100 free credits. A campaign is never given away — it has real marginal cost.",
+        ],
+        "stats": [
+            {"value": PRICING["platform"], "label": "platform / month"},
+            {"value": PRICING["tier2_floor"], "label": "serviced floor"},
+            {"value": "₹10", "label": "per credit"},
+        ],
+        "say": "Credits price the human work where it is consumed.",
+    },
+    {
+        "id": "11",
+        "label": "Unit economics",
+        "kicker": "Unit economics",
+        "headline": f"{PRICING['arpu']} blended ARPU per year.",
+        "featured": True,
+        "feature_note": "What a customer is worth, and what one costs",
+        "lines": [
+            "Subscription plus credits, per customer per year.",
+            "85% AI-executed at low marginal cost; the 15% human oversight on top carries the quality.",
+            "Marginal cost per serviced client runs ₹4,000–6,000/month — LLM ₹800–1,500, email infrastructure ₹800–1,500, roughly 5 operator hours at ₹2,000–3,000.",
+        ],
+        "stats": [
+            {"value": PRICING["arpu"], "label": "blended ARPU / yr"},
+            {"value": "₹4–6K", "label": "marginal cost / mo"},
+        ],
+        "say": "The credit line exists so the human 15% is funded, not subsidised.",
+    },
+    {
+        "id": "12",
+        "label": "Competition",
+        "kicker": "Competition",
+        "headline": "Agents are commodity. The brain is not.",
+        "featured": True,
+        "feature_note": "Why memory alone stopped being the wedge",
+        "lines": [
+            "Allya — hybrid AI + human, India-first founders and MSMEs, human QA built in, compounding business brain.",
+            "Cofounder.ai — AI agents, global founders, no human QA. Launched June 2026 at $39/mo; 12 founder personas plus saved business memory.",
+            "Nas.io — AI-assisted, creators and communities, no human QA.",
+            "Lindy.ai — AI agents, ops teams and marketers, no human QA.",
+            "What founders actually use today — agency + ChatGPT, WhatsApp VAs, fractional COOs. All human, no memory across tools.",
+            "Memory alone is no longer the wedge. The human QA gate and India-first distribution are.",
+        ],
+        "stats": [
+            {"value": "0", "label": "rivals with a human gate"},
+            {"value": "$39/mo", "label": "Cofounder.ai, no gate"},
+            {"value": "India-first", "label": "distribution"},
+        ],
+        "say": "Re-checked August 2026. Lead with the gate, not with memory.",
+    },
+    {
+        "id": "13",
+        "label": "Why now",
+        "kicker": "From copilots to autonomous execution",
+        "headline": "Four tailwinds, all sourced.",
+        "featured": False,
+        "lines": [
+            "2.23 L DPIIT-recognised startups as of 31 March 2026. FY26 alone added a record 55,200 — recognitions up 51.6% year on year, from ~350 in 2014.",
+            "63% of global WhatsApp Business downloads are Indian — the channel founders already run their business on.",
+            "+38% Indian SaaS funding year on year: $1.26B raised by April 2026 against $915M in the same period of 2025.",
+            "40% of enterprise apps embedding agents by end-2026, up from under 5% in 2025.",
+            "Sources — Ministry of Commerce & Industry (31 Mar 2026); third-party WhatsApp download compilations (2026, not a Meta figure); Tracxn (Apr 2026); Gartner (Aug 2025).",
+        ],
+        "stats": [
+            {"value": "2.23 L", "label": "DPIIT startups"},
+            {"value": "+38%", "label": "SaaS funding YoY"},
+        ],
+        "say": 'Four sourced tailwinds, not "AI agents are hot".',
+    },
+    {
+        "id": "14",
+        "label": "Team",
+        "kicker": "Operator plus deep tech",
+        "headline": "Two founders: the pain, and the build.",
+        "featured": False,
+        "lines": [
+            "Sanshat Bhatia — CEO & Founder. Built and led ops and marketing at Trailytics AI, SoftwareHunt and Zenith Media. Co-runs performance marketing agency Leadwisee — living the founder pain Allya solves.",
+            "Ayush Soni — CTO & Co-founder. IIT Bhubaneswar; led Inter-IIT teams to two Top-5 finishes. Software developer at Oracle with production LLM workflow experience.",
+            "Sep 24 — semi-automated ops agency launched; prompt workflows cut time 30%",
+            "Dec 24 — 50% automation; repositioned as outsourced cofounder; pricing misfit exposed",
+            "Jan–Mar 25 — 100-question onboarding built to standardise client context",
+            "May 25 — agent workflows built out; chatbot concept emerged",
+            "Oct 25 — full build started, CTO joined; onboarding cut from 100 to 22 questions",
+            "Nov–Dec 25 — POC launched at ~70% automation; backend pivoted; tiered onboarding",
+            "2026 → now — MVP live and in front of clients",
+        ],
+        "say": "The agency is not a side business. It is the research lab.",
+    },
+    {
+        "id": "15",
+        "label": "Roadmap",
+        "kicker": "Core platform, then ecosystem",
+        "headline": "Launch at month 6, Forge in year one, ecosystem by year three.",
+        "featured": False,
+        "lines": [
+            "Months 1–2 · Core platform — pipeline architecture and APIs, onboarding schemas, chatbot behaviour validated internally, vector database finalised.",
+            "Months 3–4 · MVP services — end-to-end flows for recruitment, policy, marketing and social. Human review loops integrated; deployment architecture finalised.",
+            "Month 6 → Year 1 · Launch, scale and Forge — public launch, service expansion, and ZeroTo10 Forge, an AI CTO for full-stack company building. WhatsApp-first integration lands here.",
+            "Year 3 · Ecosystem — multilingual foundation models and expansion into emerging markets.",
+        ],
+        "say": "WhatsApp-first is pulled into Year 1, not a Year 3 item.",
+    },
+    {
+        "id": "16",
+        "label": "The ask",
+        "kicker": "The ask",
+        "headline": "₹4 Cr for 7%, 24 months of runway.",
+        "featured": True,
+        "feature_note": "The terms, and what they buy",
+        "lines": [
+            "Monthly allocation at ~₹15 Lakh/month burn:",
+            "Salaries and team — ₹9.5 L",
+            "Marketing and GTM — ₹2.5 L",
+            "Other / buffer — ₹2 L",
+            "Server and infrastructure — ₹1 L",
+        ],
+        "stats": [
+            {"value": "₹4 Cr", "label": "capital raise"},
+            {"value": "7%", "label": "equity offered"},
+            {"value": "₹57 Cr", "label": "post-money"},
+            {"value": "24 mo", "label": "runway"},
+        ],
+        "say": "Hand over the chatbot link here and stop talking.",
+    },
+]
+
+POINTERS = [
+    {"id": "pt1", "text": "MVP is live and in front of paying-tier clients — not a prototype", "slide_id": "02"},
+    {"id": "pt2", "text": "85% of the work runs on agents; a human signs off on the other 15%", "slide_id": "04"},
+    {"id": "pt3", "text": "Onboarding builds the company model in 3–5 minutes, down from 100 questions to 22", "slide_id": "06"},
+    {"id": "pt4", "text": "20+ founder conversations, 25 willingness-to-pay responses, 80% yes at ₹5–10K/mo", "slide_id": "07"},
+    {"id": "pt5", "text": "Three named early clients, each with an outcome attached, not just task counts", "slide_id": "07"},
+    {"id": "pt6", "text": "SAM of 2 Cr founders; a 1 Lakh beachhead is 0.05% of it", "slide_id": "08"},
+    {"id": "pt7", "text": f"{PRICING['platform']}/month platform plus credits — the human 15% is funded, not subsidised", "slide_id": "10"},
+    {"id": "pt8", "text": f"{PRICING['arpu']} blended ARPU per year, subscription plus credits", "slide_id": "11"},
+    {"id": "pt9", "text": "Cofounder.ai now advertises memory too — the gate and India-first distribution are the wedge", "slide_id": "12"},
+    {"id": "pt10", "text": "FY26 added a record 55,200 DPIIT-recognised startups, up 51.6% year on year", "slide_id": "13"},
+    {"id": "pt11", "text": "CEO co-runs a live performance-marketing agency; CTO shipped production LLM workflows at Oracle", "slide_id": "14"},
+    {"id": "pt12", "text": "₹4 Cr for 7% at ₹57 Cr post, 24 months at ~₹15 L/month", "slide_id": "16"},
+]
+
+# ------------------------------------------------------------- the brain
+
+BRAIN_NODES = [
+    {"id": "co", "label": "ZeroTo10", "tier": 0, "group": "core"},
+    {"id": "product", "label": "Product", "tier": 1, "group": "product", "parent": "co"},
+    {"id": "p_what", "label": "What it does", "tier": 2, "group": "product", "parent": "product"},
+    {"id": "p_brain", "label": "The brain", "tier": 2, "group": "product", "parent": "product"},
+    {"id": "p_split", "label": "85 / 15", "tier": 2, "group": "product", "parent": "product"},
+    {"id": "p_onboard", "label": "Onboarding", "tier": 2, "group": "product", "parent": "product"},
+    {"id": "p_stack", "label": "The stack", "tier": 2, "group": "product", "parent": "product"},
+    {"id": "market", "label": "Market", "tier": 1, "group": "market", "parent": "co"},
+    {"id": "m_icp", "label": "Who it is for", "tier": 2, "group": "market", "parent": "market"},
+    {"id": "m_tam", "label": "Market size", "tier": 2, "group": "market", "parent": "market"},
+    {"id": "m_india", "label": "Why India", "tier": 2, "group": "market", "parent": "market"},
+    {"id": "m_now", "label": "Why now", "tier": 2, "group": "market", "parent": "market"},
+    {"id": "traction", "label": "Traction", "tier": 1, "group": "traction", "parent": "co"},
+    {"id": "t_live", "label": "What's live", "tier": 2, "group": "traction", "parent": "traction"},
+    {"id": "t_clients", "label": "Clients", "tier": 2, "group": "traction", "parent": "traction"},
+    {"id": "t_wtp", "label": "Will they pay", "tier": 2, "group": "traction", "parent": "traction"},
+    {"id": "t_revenue", "label": "Revenue", "tier": 2, "group": "traction", "parent": "traction"},
+    {"id": "model", "label": "Model", "tier": 1, "group": "model", "parent": "co"},
+    {"id": "mo_price", "label": "Pricing", "tier": 2, "group": "model", "parent": "model"},
+    {"id": "mo_arpu", "label": "ARPU", "tier": 2, "group": "model", "parent": "model"},
+    {"id": "mo_margin", "label": "Unit economics", "tier": 2, "group": "model", "parent": "model"},
+    {"id": "mo_scale15", "label": "15% at scale", "tier": 2, "group": "model", "parent": "model"},
+    {"id": "moat", "label": "Moat", "tier": 1, "group": "moat", "parent": "co"},
+    {"id": "x_who", "label": "Competition", "tier": 2, "group": "moat", "parent": "moat"},
+    {"id": "x_moat", "label": "Defensibility", "tier": 2, "group": "moat", "parent": "moat"},
+    {"id": "x_switch", "label": "Switching cost", "tier": 2, "group": "moat", "parent": "moat"},
+    {"id": "x_chatgpt", "label": "Why not ChatGPT", "tier": 2, "group": "moat", "parent": "moat"},
+    {"id": "team", "label": "Team", "tier": 1, "group": "team", "parent": "co"},
+    {"id": "tm_who", "label": "Founders", "tier": 2, "group": "team", "parent": "team"},
+    {"id": "tm_why", "label": "Why this team", "tier": 2, "group": "team", "parent": "team"},
+    {"id": "ask", "label": "The ask", "tier": 1, "group": "ask", "parent": "co"},
+    {"id": "a_raise", "label": "The raise", "tier": 2, "group": "ask", "parent": "ask"},
+    {"id": "a_use", "label": "Use of funds", "tier": 2, "group": "ask", "parent": "ask"},
+    {"id": "a_milestones", "label": "Milestones", "tier": 2, "group": "ask", "parent": "ask"},
+    {"id": "a_gtm", "label": "Go-to-market", "tier": 2, "group": "ask", "parent": "ask"},
+]
+
+BRAIN_EDGES = [
+    ("product", "market"), ("market", "traction"), ("traction", "model"),
+    ("model", "moat"), ("moat", "team"), ("team", "ask"), ("ask", "product"),
+    ("product", "moat"), ("market", "ask"),
+    ("p_brain", "x_moat"), ("p_split", "mo_margin"), ("p_split", "mo_scale15"),
+    ("mo_price", "m_india"), ("mo_arpu", "m_tam"), ("t_wtp", "mo_price"),
+    ("t_clients", "tm_why"), ("x_chatgpt", "p_what"), ("x_switch", "p_brain"),
+    ("a_milestones", "p_stack"), ("a_gtm", "m_icp"),
+]
+
+# ------------------------------------------------------- questions & answers
+#
+# `needs_founder` marks answers resting on a figure the deck itself flags as
+# unresolved. They are written to be honest about where the number comes from
+# rather than to fabricate one.
+#
+# `aliases` are the words an investor reaches for that do not appear in the
+# question as written. They are load-bearing: without them "who are your
+# competitors" lands on "Why India", because both answers contain the word.
+
+ANSWERS = [
+    {
+        "id": "co",
+        "question": "What is ZeroTo10, in one paragraph?",
+        "slide_id": "01",
+        "aliases": "overview summary pitch elevator company zeroto10 nutshell",
+        "text": "ZeroTo10 builds **Allya** — an AI operations layer for early-stage founders. Allya learns your business once, holds it in a connected model we call the brain, and then runs the operational work off it: marketing, hiring, PR and sales ops. Agents execute about **85%** of the work; a human signs off on the other **15%** before anything ships. We are raising **₹4 Cr for 7%** at ₹57 Cr post-money.",
+    },
+    {
+        "id": "p_what",
+        "question": "What does Allya actually do for a founder?",
+        "slide_id": "04",
+        "aliases": "product allya deliver end to end execution",
+        "text": "It runs the work end to end, rather than answering questions about it.\n\nYou brief it once. Allya researches, drafts, warms up the domain, sends, follows up and triages replies. A human checks the output before it leaves. The result is written back into your company's model, so the next task starts better informed than the last.\n\nThat last step is the difference between Allya and an answer box.",
+    },
+    {
+        "id": "p_brain",
+        "question": 'What is "the brain", concretely?',
+        "slide_id": "05",
+        "aliases": "brain memory context graph knowledge store remember",
+        "text": "A living model of **one** company — goals, constraints, ICP, tone of voice, past campaigns, what shipped, what worked and what got killed.\n\nIt is built during onboarding and gets denser with every decision the business feeds it. Every task is planned against it, which is why Allya does not need re-briefing.\n\nBeing precise: the canvas you are looking at is a *view* of the graph. The asset is the graph underneath — and the choice of which slice of it the model sees on any given task.",
+    },
+    {
+        "id": "p_split",
+        "question": "What does the 85% agent / 15% human split actually mean?",
+        "slide_id": "06",
+        "aliases": "split ratio automation percent percentage human loop oversight",
+        "text": "**85%** — research, drafting, list building, sequencing, sending, follow-up, reply triage. Machine work at low marginal cost.\n\n**15%** — a named operator reviews before anything leaves the building. On the serviced tier that person is assigned, not pooled.\n\nTwo things make it more than a talking point: the gate is **priced in credits**, so it is funded rather than subsidised, and every correction the operator makes is written back into the brain — the oversight is also the training signal.",
+    },
+    {
+        "id": "p_onboard",
+        "question": "How does onboarding work, and how long does it take?",
+        "slide_id": "06",
+        "aliases": "onboarding setup signup activate time to value questions",
+        "text": "**3–5 minutes, 22 questions.** It was 100 questions in March 2025; we cut it to 22 in October 2025 once we knew which answers actually changed downstream behaviour.\n\nIt captures goals, constraints, tone and history — enough to plan the first task against something real instead of a blank prompt.",
+    },
+    {
+        "id": "p_stack",
+        "question": "What is the technical architecture?",
+        "slide_id": "15",
+        "aliases": "stack tech technical architecture infrastructure engineering build llm model database",
+        "text": "Orchestration on **LangGraph**, models via **Claude on Amazon Bedrock**, a **Postgres + pgvector** context store, blob storage for documents, with crawler and PDF ingestion feeding the graph.\n\nThe pipeline architecture, onboarding schemas and the vector store are the **months 1–2** line on the roadmap — that is what the first tranche of this raise hardens.",
+    },
+    {
+        "id": "m_icp",
+        "question": "Who is the customer, specifically?",
+        "slide_id": "03",
+        "aliases": "icp customer persona segment beachhead audience target buyer",
+        "text": "The beachhead is the **solo services founder in India** at the point where an agency retainer stops making sense — running a business with no ops team, currently stitching together an agency, ChatGPT, a WhatsApp VA and their own evenings.\n\nFrom there it widens to small teams and MSMEs with the same shape of problem: real operational load, no operational headcount.",
+    },
+    {
+        "id": "m_tam",
+        "question": "How big is the market, and how did you size it?",
+        "slide_id": "08",
+        "needs_founder": True,
+        "aliases": "tam sam som market size sizing addressable opportunity bottom up",
+        "text": "Filtered down, not claimed top-down:\n\n- **22 Cr** total relevant population\n- **15 Cr** total addressable\n- **5.85 Cr** entrepreneurially relevant\n- **~4.05 Cr** with entrepreneurial intention (~27%)\n- **~1.8 Cr** in early-stage activity (~12%)\n- **~2 Cr** serviceable, after ~30% payment intention\n- **1 Lakh** beachhead — 0.05% of SAM\n\nAt ~₹35,000 blended ARPU, that 1 Lakh implies roughly **₹350 Cr** of annual revenue at full capture.",
+    },
+    {
+        "id": "m_india",
+        "question": "Why India first?",
+        "slide_id": "13",
+        "aliases": "india geography region local why here first market",
+        "text": "Three reasons, in order of durability:\n\n1. **Price.** At ₹1,000/month plus credits we sit under a floor US competitors cannot reach without breaking their own model.\n2. **Distribution.** 63% of global WhatsApp Business downloads are Indian. That is the channel these founders already run their business on, and it is a Year 1 integration for us, not a Year 3 one.\n3. **Home advantage.** We are Indian operators selling to Indian founders — we know the pain because we run an agency serving them.",
+    },
+    {
+        "id": "m_now",
+        "question": "Why is now the moment?",
+        "slide_id": "13",
+        "aliases": "timing tailwind why now trend macro market timing",
+        "text": "- **2.23 L** DPIIT-recognised startups as of 31 March 2026 — FY26 alone added a record **55,200**, up **51.6%** year on year from ~350 in 2014.\n- **+38%** Indian SaaS funding year on year: $1.26B by April 2026 against $915M in the same period of 2025.\n- **40%** of enterprise apps will embed task-specific agents by end-2026, up from under 5% in 2025 (Gartner).\n\nThe supply of founders and the capability of agents crossed in the same eighteen months.",
+    },
+    {
+        "id": "t_live",
+        "question": "What is actually live today?",
+        "slide_id": "14",
+        "aliases": "live shipped status product stage mvp working today progress",
+        "text": "**MVP, live and in front of clients.**\n\nThe path there: a semi-automated ops agency in Sep 2024 (prompt workflows cut delivery time 30%), 50% automation by Dec 2024, agent workflows through 2025, full build from Oct 2025 when the CTO joined, POC in Nov–Dec 2025 at roughly **70% automation**, and the MVP in front of clients through 2026.\n\nWe have been running this as a service for two years. The product is the automation of work we were already delivering by hand.",
+    },
+    {
+        "id": "t_clients",
+        "question": "Who is using it, and what happened?",
+        "slide_id": "07",
+        "aliases": "client customer user logo case study reference pilot",
+        "text": "- **Mili Khare** (dietician) — 28 tasks in 30 days across 3 client tiers; cut lead drop-offs and stabilised monthly revenue.\n- **SurferSearcher** (marketing agency) — repositioned toward US B2B SaaS clients; **13 outbound campaigns live in month one**.\n- **Dori** (q-commerce) — idea validated through customer interviews and prior data; onboarding flows designed.\n\nAnd internally: ZeroTo10 ran its own TAM sizing, its validation process and this deck through Allya. Dogfooding, labelled as such.",
+    },
+    {
+        "id": "t_wtp",
+        "question": "What proof do you have that people will pay?",
+        "slide_id": "07",
+        "aliases": "willingness pay validation demand evidence proof survey interest",
+        "text": "**20+** founder conversations, **25** willingness-to-pay responses, and **80% said yes at ₹5–10K/month** — a band that sits above our serviced-tier floor of ₹5,500.\n\nThe honest read: that is stated intent at survey scale, not booked revenue. It set the price; it does not prove the market. Converting it is what the first six months of the GTM plan exist to do.",
+    },
+    {
+        "id": "t_revenue",
+        "question": "What is your revenue today?",
+        "slide_id": "11",
+        "needs_founder": True,
+        "aliases": "revenue arr mrr run rate booked invoiced sales income money making",
+        "text": "We are pre-seed and early — three clients have run real work through Allya, and the commercial model has only just settled at ₹1,000/month plus credits.\n\nWe will give you the exact invoiced figure and the current run rate in the meeting rather than a rounded number on a slide. What we will commit to publicly: the ARPU model is **₹35,000/year blended**, subscription plus credits.",
+    },
+    {
+        "id": "mo_price",
+        "question": "What do you charge, and what does that include?",
+        "slide_id": "10",
+        "aliases": "price pricing cost charge subscription tier plan credits fee",
+        "text": f"**{PRICING['platform']}/month** for the platform — context store, unlimited asking, LinkedIn drafting and publishing. Self-serve. This is the funnel, not the business.\n\n**{PRICING['platform']}/month plus a minimum 500 credits** for the serviced tier — the human 15%, an email warm-up slot, campaign execution and a named operator. Floor **{PRICING['tier2_floor']}/month**, realistic run rate **{PRICING['tier2_run']}/month**. This is what the first ten customers buy.\n\nCredits are prepaid, **{PRICING['credit_rate']}**, and never expire. First month free is free platform plus 100 credits — never a free campaign, because a campaign has real marginal cost.",
+    },
+    {
+        "id": "mo_arpu",
+        "question": "What is ARPU, and how is it built?",
+        "slide_id": "11",
+        "aliases": "arpu average revenue per user account value",
+        "text": f"**{PRICING['arpu']} per customer per year, blended** — subscription plus credit consumption.\n\nThe subscription is predictable and small. The credits are the variable line, and they scale with how much work a customer actually pushes through, which is also the signal that they have outgrown the entry tier.",
+    },
+    {
+        "id": "mo_margin",
+        "question": "What do the unit economics look like?",
+        "slide_id": "11",
+        "needs_founder": True,
+        "aliases": "margin gross margin unit economics cogs contribution payback ltv burn cost profitability",
+        "text": "Marginal cost on a serviced client runs **₹4,000–6,000/month**: LLM ₹800–1,500, email infrastructure ₹800–1,500, and roughly 5 operator hours at ₹2,000–3,000.\n\nThat cost is exactly why the credit line exists — the human 15% is priced where it is consumed rather than averaged into a flat fee it cannot fund. A flat ₹2,000/month could not carry it, which is why we moved off it.\n\nGross margin at 100 / 500 / 1,000 customers, payback and LTV are a model we will walk you through line by line rather than compress into a slide.",
+    },
+    {
+        "id": "mo_scale15",
+        "question": "What happens to the human 15% at 1,000 customers?",
+        "slide_id": "12",
+        "needs_founder": True,
+        "aliases": "scale scaling operator headcount human review oversight bottleneck capacity quality",
+        "text": "The sharpest question in the deck, and we do not pretend it is solved.\n\nThree things carry it:\n\n1. **It is paid for.** Operator time is priced in credits, so review capacity scales with revenue instead of eating margin.\n2. **It should shrink per task.** Every correction is written back into the brain, so the same review on the same account gets cheaper over time. That is the whole bet.\n3. **It is a floor, not a constant.** 15% is oversight on what ships, not on every action.\n\nIf the per-task review cost does not fall as the brain gets denser, the model is a services business with good tooling. Watching that number is how you should hold us accountable.",
+    },
+    {
+        "id": "x_who",
+        "question": "Who do you compete with?",
+        "slide_id": "12",
+        "aliases": "competitor competition rival alternative landscape versus compare cofounder lindy nas incumbent",
+        "text": "- **Cofounder.ai** — AI agents, global founders, no human QA. Launched June 2026 at $39/mo with 12 founder personas and saved business memory.\n- **Nas.io** — AI-assisted, creators and communities, no human QA.\n- **Lindy.ai** — AI agents, ops teams and marketers, no human QA.\n- **What founders actually use today** — an agency plus ChatGPT, a WhatsApp VA, a fractional COO. All human, no memory across tools.\n\nThe last row is the real competitor. The others are the ones you will ask about.",
+    },
+    {
+        "id": "x_moat",
+        "question": "What stops a well-funded competitor copying this?",
+        "slide_id": "12",
+        "aliases": "moat defensibility barrier advantage differentiation why you win durable copy clone replicate copycat fast follower google openai",
+        "text": "Not the interface. We will say that plainly — a canvas with spring physics is a few weeks of work and the whole competitive surface fits in a screenshot.\n\nWhat compounds:\n\n- the **accumulated per-company graph** — every decision, correction and outcome, per customer\n- **outcome data** — what was approved, shipped, killed, and whether it worked\n- **context assembly** — which slice of the graph the model sees for a given task. This is the real IP and it is invisible from outside.\n- **the human gate**, which is a cost centre competitors have chosen not to carry\n\nMemory alone stopped being the wedge in June 2026 when Cofounder.ai shipped it. The gate plus India-first distribution is what is left, and it is the harder half to copy.",
+    },
+    {
+        "id": "x_switch",
+        "question": "What is the switching cost once a customer is on?",
+        "slide_id": "12",
+        "needs_founder": True,
+        "aliases": "switching cost lock in retention churn stickiness leave",
+        "text": "Leaving means re-explaining your company from zero — to a tool that starts where Allya started, without the campaign history, the tone corrections or the record of what already failed.\n\nThe cost rises with tenure by construction, which is the point of putting the store before the agents.\n\nWe will not overclaim it: at three clients, switching cost is a design property, not yet an observed retention number.",
+    },
+    {
+        "id": "x_chatgpt",
+        "question": "Why would a founder not just use ChatGPT?",
+        "slide_id": "03",
+        "aliases": "chatgpt claude gemini openai llm assistant why not just use diy",
+        "text": "Most of them do, and that is who we are actually competing with.\n\nTwo differences. **ChatGPT answers; Allya finishes the job** — the sending, the warm-up, the follow-up, the reply triage. And Allya is briefed once: the founder in our problem slide is asking ChatGPT the same question for the third time on Thursday.\n\nMemory is no longer a differentiator on its own — the frontier assistants have it. Execution with a human gate on the output is.",
+    },
+    {
+        "id": "tm_who",
+        "question": "Who is building ZeroTo10?",
+        "slide_id": "14",
+        "aliases": "team founder cofounder background who built people bios",
+        "text": "**Sanshat Bhatia — CEO & Founder.** Built and led ops and marketing at Trailytics AI, SoftwareHunt and Zenith Media. Co-runs Leadwisee, a performance marketing agency.\n\n**Ayush Soni — CTO & Co-founder.** IIT Bhubaneswar; led Inter-IIT teams to two Top-5 finishes. Software developer at Oracle with production LLM workflow experience.",
+    },
+    {
+        "id": "tm_why",
+        "question": "Why is this the right team for this problem?",
+        "slide_id": "14",
+        "aliases": "why this team founder market fit unfair advantage credibility experience",
+        "text": "The agency is not a side business — it is the research lab. Leadwisee serves exactly the founders Allya sells to, which means the pain is observed weekly rather than surveyed once, and every workflow in the product was delivered by hand first.\n\nThat is also the origin: Allya started as the automation of our own delivery. Sep 2024 prompt workflows, 50% automation by December, 70% at the POC. We productised what already worked.\n\nOn the build side, the LLM-workflow experience is production experience, not weekend experience.",
+    },
+    {
+        "id": "a_raise",
+        "question": "What are you raising, and on what terms?",
+        "slide_id": "16",
+        "aliases": "raise raising round valuation terms dilution equity ask post money entity structure incorporation",
+        "text": "**₹4 Cr for 7%**, at **₹57 Cr post-money**. That is **24 months of runway** at roughly ₹15 Lakh per month.\n\nWe are a registered partnership firm in Faridabad, Haryana (deed 19 January 2026). Conversion to a private limited company is triggered by exactly this — external investment — and would happen as part of the round.",
+    },
+    {
+        "id": "a_use",
+        "question": "What does the money actually buy?",
+        "slide_id": "16",
+        "aliases": "use of funds spend allocation burn budget hiring plan",
+        "text": "Monthly, at ~₹15 Lakh burn:\n\n- **₹9.5 L** — salaries and team\n- **₹2.5 L** — marketing and GTM\n- **₹2 L** — other and buffer\n- **₹1 L** — server and infrastructure\n\nThe weight is on people, because the constraint over the next four months is shipping the core platform and the human review loop, not spend.",
+    },
+    {
+        "id": "a_milestones",
+        "question": "What does ₹4 Cr get you to?",
+        "slide_id": "15",
+        "needs_founder": True,
+        "aliases": "milestone roadmap plan next 12 18 months deliver launch series a next round follow on graduation trigger threshold",
+        "text": "The roadmap this capital funds:\n\n- **Months 1–2** — core platform: pipeline architecture and APIs, onboarding schemas, the context store finalised\n- **Months 3–4** — MVP services end to end for recruitment, policy, marketing and social, with human review loops integrated\n- **Month 6** — public launch, after the six-phase channel rollout has built the waitlist\n- **Year 1** — service expansion, WhatsApp-first integration, and ZeroTo10 Forge\n\nThe milestone that matters to you is month 6: launch with proof rather than launch with a landing page.\n\nOn the Series A trigger: directionally, a repeatable serviced-tier motion that holds without founder-led selling, with the per-task human review cost visibly falling. The specific MRR and customer-count thresholds come with the model behind them, not as an assertion here.",
+    },
+    {
+        "id": "a_gtm",
+        "question": "How do you acquire founders?",
+        "slide_id": "09",
+        "needs_founder": True,
+        "aliases": "gtm go to market acquire acquisition customer channel cac distribution marketing growth funnel sales",
+        "text": "Six months, sequenced by **trust depth × memory lifespan** — the channels where a post keeps working are worked first:\n\n- **M1** problem ID — reply to problem-led posts on X\n- **M2** brand building — daily reels, startup communities, affiliates\n- **M3** validation — community input shifts focus to demand capture\n- **M4** public waitlist, webinars, partnership placements\n- **M5** private beta — manual onboarding, close observation, testimonials\n- **M6** public launch across every active channel\n\nInstagram, YouTube, X, Reddit, Email, LinkedIn — in that order of trust depth. CAC by channel is what the rollout is instrumented to find.",
+    },
+]
