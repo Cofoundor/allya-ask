@@ -171,10 +171,10 @@ button, input, textarea { font-family: inherit; color: inherit; }
   position: absolute; inset: 0; z-index: 0;
   pointer-events: none;
   background: radial-gradient(
-    62% 46% at 50% 50%,
-    rgba(10, 10, 10, 0.97) 0%,
-    rgba(10, 10, 10, 0.93) 42%,
-    rgba(10, 10, 10, 0.6) 72%,
+    48% 36% at 50% 50%,
+    rgba(10, 10, 10, 0.92) 0%,
+    rgba(10, 10, 10, 0.84) 46%,
+    rgba(10, 10, 10, 0.42) 76%,
     rgba(10, 10, 10, 0) 100%
   );
 }

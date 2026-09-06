@@ -1,5 +1,14 @@
 # Ask Allya
 
+> ## 🧪 EXPERIMENT — not deployed
+>
+> A redesign of the ask.zeroto10.xyz preview. **The live site still runs the old app** — nothing
+> here is deployed. It preserves the existing API contract exactly (see The API below), so it can
+> drop in front of the current backend when someone decides to ship it.
+>
+> Shares its design system with [`../product-next`](../product-next) — `spring.ts` is byte-identical
+> in both, so fixes move between them. See [`../README.md`](../README.md).
+
 The public preview at **ask.zeroto10.xyz** — leave an email, then ask Allya
 anything about ZeroTo10.
 
@@ -7,6 +16,32 @@ This is a redesign of that page in the visual language of the Allya product
 UI: the zeroto10.xyz palette, Allya's serif voice, and the company brain
 running live behind the conversation. The API contract is unchanged, so it
 drops straight in front of the existing backend.
+
+## Two rooms
+
+| Route | What it is | Backend |
+|---|---|---|
+| `/` | The founder-facing preview — email gate, then chat with Allya. | The live investor-chat API (see The API below). |
+| `/investors` | **The investor room.** The pitch deck in a rail on the left, the brain in the middle with the questions investors actually ask, and hand-written answers. | None — every answer is hard-coded. |
+
+`/investors` is the page slide 16 of the deck promises ("here's a dedicated
+chatbot you can grill before you grill us"). It has **no model behind it**:
+`src/lib/investor-qa.ts` holds ~30 questions with answers written by hand and
+grounded in the deck, and a keyword matcher that either finds one or says it
+has none. It never bluffs — an investor catching a fabricated number costs more
+than being told to ask the founder.
+
+Two things in that file to know about:
+
+- **`needsFounder: true`** marks the answers resting on a figure the deck
+  itself flags as unresolved — invoiced revenue, gross margin at scale, the
+  Series A trigger, CAC, the bottom-up market model. Those answers are written
+  to be straight about where the number comes from instead of inventing one.
+  They are the ones to shore up first.
+- **`PRICING` in `src/lib/deck.ts`** is the single source for the commercial
+  model. The deck still prints ₹2,000/mo; pricing was re-settled on
+  2 Sep 2026 at ₹1,000/mo plus credits, and this page uses the current number.
+  **The deck and this page disagree until one of them is updated.**
 
 ## Stack
 

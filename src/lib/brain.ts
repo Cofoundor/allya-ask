@@ -25,6 +25,8 @@ export const GROUPS: Record<string, string> = {
   traction: '#5fbfa8',
   model: '#d9a441',
   team: '#a78bda',
+  moat: '#e0876a',
+  ask: '#b4e88a',
 };
 
 const TAU = Math.PI * 2;
@@ -54,6 +56,9 @@ export interface BrainOptions {
   nodes: NodeSpec[];
   cross?: [string, string][];
   thoughtEvery?: number;
+  /** how far the leaves fan from the centre, as a fraction of width.
+      Lower it in a short, wide box so labels don't run off the edge. */
+  leafSpread?: number;
   /** a node tapped by the visitor — the surface turns it into a question */
   onTap?: (node: NodeSpec) => void;
 }
@@ -170,7 +175,7 @@ export function createBrain(canvas: HTMLCanvasElement, box: HTMLElement, opts: B
     const depts = nodes.filter((n) => n.tier === 1);
     const rx1 = W * 0.22;
     const ry1 = H * 0.3;
-    const rx2 = W * 0.4;
+    const rx2 = W * (opts.leafSpread ?? 0.4);
     const ry2 = H * 0.4;
 
     depts.forEach((d, i) => {
