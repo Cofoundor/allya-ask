@@ -1,8 +1,9 @@
 /* ============================================================
-   Ask Allya — the same design language as the Allya product UI.
-   Palette: zeroto10.xyz. Signature: Allya speaks in Fraunces serif —
-   only in her bubbles. Everything else is Inter Tight interface.
-   Motion: springs live in JS; CSS handles one-shot entrances.
+   Shared foundation — tokens, and the atoms both pages use.
+
+   Values are lifted from the product workspace (product/styles.css, live at
+   allyafn.netlify.app) so the two surfaces are visually the same tool. The
+   workspace layout itself lives in investors/investors.css.
    ============================================================ */
 
 :root {
@@ -10,9 +11,10 @@
 
   /* zeroto10.xyz palette */
   --bg: #0a0a0a;
-  --surface: #141414;       /* fields */
-  --card: #171717;          /* bubbles */
-  --raised: #1c1c1c;        /* hover */
+  --surface: #141414;       /* fields, rows */
+  --card: #171717;          /* bubbles, drafts */
+  --raised: #1c1c1c;        /* hover / selected row */
+  --panel: #111111;
   --fg: #f3f4f6;
   --fg-soft: #9ca3af;
   --fg-faint: #6b7280;
@@ -25,17 +27,19 @@
   --lime-dim: rgba(145, 212, 95, 0.14);
   --on-lime: #0a0a0a;
 
-  --danger: #ff6b6b;
-  --danger-bg: #2a1414;
-  --danger-border: #4a2020;
+  /* human experts (the 15%) — warm amber in the dark */
+  --human-bg: #2a2113;
+  --human-border: #453619;
+  --human-ink: #e7c98a;
+
+  --danger: #ff4d4d;
 
   --serif: var(--font-serif), Georgia, serif;              /* Allya's voice */
   --sans: var(--font-sans), system-ui, sans-serif;         /* the interface */
 
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --spring: cubic-bezier(0.2, 0.9, 0.25, 1);
   --dur: 200ms;
-
-  --column: 760px;
 }
 
 * { box-sizing: border-box; }
@@ -50,7 +54,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  overflow: hidden;               /* the transcript scrolls, not the page */
+  overflow: hidden;               /* panes scroll, not the page */
 }
 
 ::selection { background: var(--lime); color: var(--on-lime); }
@@ -65,63 +69,62 @@ button, input, textarea { font-family: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; border-radius: 6px; }
 
 /* ============================================================
-   The shell — one canvas, two screens over it
+   Atoms
    ============================================================ */
-.shell {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-/* the brain: full bleed behind everything, mounted once. It is the loudest
-   thing on the gate and recedes to a backdrop once you start talking. */
-.ambient {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  transition: opacity 900ms var(--ease);
-}
-.ambient canvas { display: block; }
-.shell.is-gate .ambient { opacity: 1; }
-.shell.is-chat .ambient { opacity: 0.34; }
-
-/* ============================================================
-   Shared: mark, lamp, pill, spinner
-   ============================================================ */
-.mark {
-  display: inline-flex; align-items: center; gap: 9px;
-  font-size: 15px; font-weight: 550; letter-spacing: -0.01em;
-  color: var(--fg);
-}
 .lamp {
   width: 8px; height: 8px; border-radius: 50%; flex: none;
   background: var(--lime);
   box-shadow: 0 0 10px rgba(145, 212, 95, 0.55);
-  animation: pulse 2.4s var(--ease) infinite;
 }
 @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }
 
+.group-label {
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--fg-faint);
+  margin: 22px 0 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.group-label .count {
+  font-size: 10.5px; letter-spacing: 0;
+  background: var(--surface); border: 1px solid var(--hairline);
+  border-radius: 999px; padding: 1px 7px; color: var(--fg-soft);
+}
+
+/* origin pills — the honest 85/15 seam */
 .pill {
-  flex: none; font-size: 10.5px; font-weight: 500;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  border-radius: 999px; padding: 3px 8px;
+  flex: none; font-size: 11px; font-weight: 500;
+  border-radius: 999px; padding: 3px 9px;
   border: 1px solid var(--hairline);
   color: var(--fg-soft); background: var(--surface);
 }
+.pill.expert { color: var(--human-ink); background: var(--human-bg); border-color: var(--human-border); }
+.pill.ready,
+.pill.review { color: var(--lime-glow); background: var(--lime-dim); border-color: rgba(145,212,95,0.4); }
 
 .spinner {
-  flex: none; width: 13px; height: 13px; border-radius: 50%;
+  flex: none; width: 15px; height: 15px; border-radius: 50%;
   border: 2px solid rgba(145,212,95,0.18); border-top-color: var(--lime);
   animation: spin 0.9s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg) } }
 
-/* ============================================================
-   Shared: the field and its send button
-   ============================================================ */
+.cta {
+  appearance: none; border: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--sans); font-size: 13.5px; font-weight: 600; letter-spacing: -0.005em;
+  color: var(--on-lime);
+  background: var(--lime);
+  border-radius: 9px;
+  padding: 10px 16px;
+  white-space: nowrap;
+  touch-action: manipulation;
+  will-change: transform;
+}
+.cta:hover { background: var(--lime-glow); }
+
 .field {
-  display: flex; align-items: flex-end; gap: 10px;
+  display: flex; align-items: center; gap: 10px;
   background: var(--surface);
   border: 1px solid var(--hairline-strong);
   border-radius: 12px;
@@ -129,19 +132,14 @@ button, input, textarea { font-family: inherit; color: inherit; }
   transition: border-color var(--dur) var(--ease);
 }
 .field:focus-within { border-color: var(--lime); }
-.field input,
-.field textarea {
+.field input {
   flex: 1; min-width: 0;
   border: none; outline: none; background: transparent;
-  font-family: var(--sans); font-size: 14.5px; color: var(--fg);
-  padding: 10px 0;
-  line-height: 1.45;
+  font-family: var(--sans); font-size: 14px; color: var(--fg);
+  padding: 9px 0;
 }
-.field textarea { resize: none; max-height: 148px; }
-.field input::placeholder,
-.field textarea::placeholder { color: var(--fg-faint); }
-.field input:disabled,
-.field textarea:disabled { opacity: 0.5; }
+.field input::placeholder { color: var(--fg-faint); }
+.field input:disabled { opacity: 0.5; }
 
 .send {
   flex: none; width: 36px; height: 36px; border-radius: 9px;
@@ -155,8 +153,130 @@ button, input, textarea { font-family: inherit; color: inherit; }
 .send svg { width: 16px; height: 16px; }
 
 /* ============================================================
-   The gate
+   The transcript — same voice rules as the product
    ============================================================ */
+.msg { display: flex; margin-top: 10px; }
+.msg.change { margin-top: 22px; }
+.msg.from-you { justify-content: flex-end; }
+.msg-block { max-width: 82%; }
+.speaker { font-size: 11.5px; font-weight: 500; color: var(--fg-faint); margin: 0 2px 5px; }
+
+.bubble {
+  padding: 11px 15px;
+  border-radius: 14px;
+  line-height: 1.5;
+  animation: bubble-in 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes bubble-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Allya — the serif voice, card surface */
+.bubble.allya {
+  font-family: var(--serif); font-optical-sizing: auto; font-weight: 420;
+  font-size: 16px;
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-bottom-left-radius: 5px;
+  color: var(--fg);
+}
+/* you — light fill, sans (you are the interface's operator) */
+.bubble.you {
+  font-family: var(--sans); font-size: 14px; font-weight: 450;
+  background: var(--fg);
+  color: var(--bg);
+  border-bottom-right-radius: 5px;
+  white-space: pre-wrap;
+}
+.bubble.is-error {
+  font-family: var(--sans); font-size: 13.5px; font-weight: 450;
+  background: #2a1414;
+  border-color: #4a2020;
+  color: #ff6b6b;
+}
+
+/* what Allya writes: light markdown, rendered as real elements */
+.bubble.allya p { margin: 0 0 0.7em; }
+.bubble.allya p:last-child { margin-bottom: 0; }
+.bubble.allya ul,
+.bubble.allya ol { margin: 0.2em 0 0.7em; padding-left: 1.25em; }
+.bubble.allya ul:last-child,
+.bubble.allya ol:last-child { margin-bottom: 0; }
+.bubble.allya li { margin: 0.25em 0; }
+.bubble.allya li::marker { color: var(--lime); }
+.bubble.allya strong { font-weight: 600; }
+.bubble.allya code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.86em;
+  background: rgba(255,255,255,0.06);
+  border-radius: 5px; padding: 1px 5px;
+}
+.bubble.allya a { color: var(--lime-glow); text-underline-offset: 3px; }
+
+.typing { display: inline-flex; gap: 5px; padding: 14px 16px; }
+.typing i {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--fg-faint);
+  animation: bob 1.2s var(--ease) infinite;
+}
+.typing i:nth-child(2) { animation-delay: 0.15s; }
+.typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes bob { 0%,60%,100% { transform: translateY(0); opacity:.5 } 30% { transform: translateY(-4px); opacity:1 } }
+
+.msg-tools { display: flex; gap: 6px; margin: 6px 2px 0; }
+.tool {
+  appearance: none; background: none; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  border: none; padding: 3px 4px;
+  font-size: 11.5px; font-weight: 500; color: var(--fg-faint);
+  transition: color var(--dur) var(--ease);
+}
+.tool:hover { color: var(--lime-glow); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 2px 4px; justify-content: flex-end; }
+.chip {
+  appearance: none; cursor: pointer;
+  font-family: var(--sans); font-size: 13px; font-weight: 500;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  padding: 8px 14px;
+  touch-action: manipulation;
+  will-change: transform;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.chip:hover { background: var(--raised); }
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+.rise-in { animation: rise-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ============================================================
+   The login — a full-bleed brain with the gate sunk into it
+   ============================================================ */
+.shell {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transition: opacity 900ms var(--ease);
+}
+.ambient canvas { display: block; }
+
+.mark {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: 15px; font-weight: 550; letter-spacing: -0.01em;
+  color: var(--fg);
+}
+.mark .lamp { animation: pulse 2.4s var(--ease) infinite; }
+
 .gate {
   position: relative; z-index: 1;
   flex: 1; min-height: 0;
@@ -198,7 +318,6 @@ button, input, textarea { font-family: inherit; color: inherit; }
   font-size: 14.5px; line-height: 1.6; color: var(--fg-soft);
   margin: 0 auto 28px; max-width: 42ch;
 }
-
 .gate-form { margin: 0 auto; max-width: 400px; }
 
 .gate-note {
@@ -214,204 +333,10 @@ button, input, textarea { font-family: inherit; color: inherit; }
 }
 
 /* ============================================================
-   The chat
-   ============================================================ */
-.chat {
-  position: relative; z-index: 1;
-  flex: 1; min-height: 0;
-  display: flex; flex-direction: column;
-}
-
-.topbar {
-  flex: none;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px;
-  padding: 14px 24px;
-  border-bottom: 1px solid var(--hairline);
-  background: rgba(10,10,10,0.86);
-  backdrop-filter: blur(12px);
-}
-.topbar-note { font-size: 12.5px; color: var(--fg-faint); }
-
-/* the reading column only covers the middle, so the brain in the gutters
-   stays reachable — tap a node and it writes the question for you */
-.transcript {
-  flex: 1; min-height: 0;
-  width: 100%; max-width: var(--column);
-  margin: 0 auto;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 0 24px;
-}
-.transcript-inner { padding: 26px 0 8px; }
-
-.msg { display: flex; margin-top: 10px; }
-.msg.change { margin-top: 24px; }
-.msg.from-you { justify-content: flex-end; }
-.msg-block { max-width: 88%; }
-.speaker {
-  font-size: 11.5px; font-weight: 500; color: var(--fg-faint);
-  margin: 0 2px 5px;
-}
-
-.bubble {
-  padding: 12px 16px;
-  border-radius: 14px;
-  line-height: 1.55;
-  animation: bubble-in 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@keyframes bubble-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: none; }
-}
-/* Allya — the serif voice, card surface */
-.bubble.allya {
-  font-family: var(--serif); font-optical-sizing: auto; font-weight: 420;
-  font-size: 16px;
-  background: var(--card);
-  border: 1px solid var(--hairline);
-  border-bottom-left-radius: 5px;
-  color: var(--fg);
-}
-/* you — light fill, sans (you are the interface's operator) */
-.bubble.you {
-  font-family: var(--sans); font-size: 14px; font-weight: 450;
-  background: var(--fg);
-  color: var(--bg);
-  border-bottom-right-radius: 5px;
-  white-space: pre-wrap;
-}
-.bubble.is-error {
-  font-family: var(--sans); font-size: 13.5px; font-weight: 450;
-  background: var(--danger-bg);
-  border-color: var(--danger-border);
-  color: var(--danger);
-}
-
-/* what Allya writes: light markdown, rendered as real elements */
-.bubble.allya p { margin: 0 0 0.7em; }
-.bubble.allya p:last-child { margin-bottom: 0; }
-.bubble.allya ul,
-.bubble.allya ol { margin: 0.2em 0 0.7em; padding-left: 1.25em; }
-.bubble.allya ul:last-child,
-.bubble.allya ol:last-child { margin-bottom: 0; }
-.bubble.allya li { margin: 0.25em 0; }
-.bubble.allya li::marker { color: var(--lime); }
-.bubble.allya strong { font-weight: 600; }
-.bubble.allya code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.86em;
-  background: rgba(255,255,255,0.06);
-  border-radius: 5px; padding: 1px 5px;
-}
-.bubble.allya a { color: var(--lime-glow); text-underline-offset: 3px; }
-
-.typing { display: inline-flex; gap: 5px; padding: 15px 16px; }
-.typing i {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--fg-faint);
-  animation: bob 1.2s var(--ease) infinite;
-}
-.typing i:nth-child(2) { animation-delay: 0.15s; }
-.typing i:nth-child(3) { animation-delay: 0.3s; }
-@keyframes bob { 0%,60%,100% { transform: translateY(0); opacity:.5 } 30% { transform: translateY(-4px); opacity:1 } }
-
-/* copy / retry — quiet until you go looking for them */
-.msg-tools { display: flex; gap: 6px; margin: 6px 2px 0; }
-.tool {
-  appearance: none; background: none; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 5px;
-  border: none; padding: 3px 4px;
-  font-size: 11.5px; font-weight: 500; color: var(--fg-faint);
-  opacity: 0; will-change: transform;
-  transition: color var(--dur) var(--ease), opacity var(--dur) var(--ease);
-}
-.msg:hover .tool,
-.tool:focus-visible { opacity: 1; }
-.tool:hover { color: var(--fg-soft); }
-.bubble.is-error + .msg-tools .tool { opacity: 1; color: var(--danger); }
-
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 2px 4px; }
-.chip {
-  appearance: none; cursor: pointer;
-  font-family: var(--sans); font-size: 13px; font-weight: 500;
-  color: var(--fg);
-  background: rgba(10,10,10,0.6);
-  border: 1px solid var(--hairline-strong);
-  border-radius: 999px;
-  padding: 8px 14px;
-  touch-action: manipulation;
-  will-change: transform;
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
-  animation: rise-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.chip:hover { background: var(--raised); border-color: var(--lime); }
-@keyframes rise-in {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: none; }
-}
-.rise-in { animation: rise-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-
-/* ============================================================
-   The composer
-   ============================================================ */
-.composer {
-  flex: none;
-  padding: 10px 24px 16px;
-  border-top: 1px solid var(--hairline);
-  background: rgba(12,12,12,0.94);
-  backdrop-filter: blur(12px);
-}
-.composer-inner { width: 100%; max-width: var(--column); margin: 0 auto; }
-.composer-hint {
-  margin: 8px 2px 0;
-  font-size: 11.5px; color: var(--fg-faint);
-}
-.tap-hint { display: none; }
-
-/* ============================================================
-   The toast
-   ============================================================ */
-.toast-rail { flex: none; position: relative; z-index: 3; height: 0; }
-.toast {
-  position: absolute;
-  left: 50%; bottom: 12px;
-  background: var(--card);
-  border: 1px solid var(--hairline-strong);
-  border-radius: 999px;
-  padding: 8px 16px;
-  font-size: 12.5px; color: var(--fg-soft);
-  opacity: 0; pointer-events: none;
-  animation: toast 1900ms var(--ease) both;
-}
-@keyframes toast {
-  0%        { opacity: 0; transform: translate(-50%, 8px); }
-  8%, 82%   { opacity: 1; transform: translate(-50%, 0); }
-  100%      { opacity: 0; transform: translate(-50%, 4px); }
-}
-
-/* ============================================================
-   Wider screens: the brain is exposed either side of the column
-   ============================================================ */
-@media (min-width: 900px) {
-  .tap-hint { display: inline; }
-  .transcript-inner { padding-top: 34px; }
-}
-
-@media (max-width: 560px) {
-  .topbar, .composer { padding-left: 16px; padding-right: 16px; }
-  .transcript { padding: 0 16px; }
-  .msg-block { max-width: 94%; }
-  .tool { opacity: 1; }          /* no hover to reveal them on touch */
-}
-
-/* ============================================================
    Accessibility
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   .typing i, .spinner, .lamp { animation: none !important; }
   .bubble, .chip, .rise-in { animation: none !important; }
   * { transition-duration: 0.01ms !important; }
-}
-@media (prefers-reduced-transparency: reduce) {
-  .topbar, .composer { background: var(--bg); backdrop-filter: none; }
 }

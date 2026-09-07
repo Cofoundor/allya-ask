@@ -71,6 +71,8 @@ export interface Room {
   brain_title: string;
   brain_subtitle: string;
   composer_placeholder: string;
+  /** the topbar's live line, the way the product shows agents running */
+  status_line: string;
   chips: Stat[];
   metrics: Stat[];
   openers: Opener[];

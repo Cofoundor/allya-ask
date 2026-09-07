@@ -27,6 +27,7 @@ ROOM = {
     "brain_title": "The brain",
     "brain_subtitle": "every question an investor asks — touch it",
     "composer_placeholder": "Ask anything — pricing, the moat, the 15%, the raise…",
+    "status_line": "₹4 Cr for 7% · 24 months of runway",
     "chips": [
         {"value": "₹4 Cr", "label": "for 7%"},
         {"value": "MVP live", "label": ""},
@@ -77,15 +78,15 @@ SLIDES = [
         "featured": True,
         "feature_note": "The whole pitch in six numbers",
         "lines": [
-            "Two things compound, and neither is a feature: the brain gets denser with every decision a business feeds it, and a human signs off before anything ships.",
-            "Competitors ship agents. Nobody ships both.",
+            "Two things compound, and neither is a feature: the per-company graph gets denser with every decision, correction and outcome, and a human signs off before anything ships.",
+            "Competitors ship agents. Cofounder.ai shipped memory in June 2026. Nobody ships the gate.",
         ],
         "stats": [
             {"value": "MVP live", "label": "Product"},
             {"value": "₹35K", "label": "ARPU / year"},
             {"value": "₹4 Cr / 7%", "label": "Raise"},
             {"value": "25", "label": "WTP responses"},
-            {"value": "Bottom-up", "label": "Market sizing"},
+            {"value": "2 Cr", "label": "SAM, filtered"},
             {"value": "Phased", "label": "GTM rollout"},
         ],
         "say": "One-line pitch, then the six numbers.",
@@ -242,7 +243,8 @@ SLIDES = [
         "featured": True,
         "feature_note": "What a customer is worth, and what one costs",
         "lines": [
-            "Subscription plus credits, per customer per year.",
+            "₹12K of subscription plus credit consumption, blended across the tier mix — roughly 80% self-serve, 20% serviced.",
+            "A serviced customer alone runs ₹108K–144K/year, so the blend moves with how many graduate, not with a price change.",
             "85% AI-executed at low marginal cost; the 15% human oversight on top carries the quality.",
             "Marginal cost per serviced client runs ₹4,000–6,000/month — LLM ₹800–1,500, email infrastructure ₹800–1,500, roughly 5 operator hours at ₹2,000–3,000.",
         ],
@@ -538,7 +540,7 @@ ANSWERS = [
         "question": "What is ARPU, and how is it built?",
         "slide_id": "11",
         "aliases": "arpu average revenue per user account value",
-        "text": f"**{PRICING['arpu']} per customer per year, blended** — subscription plus credit consumption.\n\nThe subscription is predictable and small. The credits are the variable line, and they scale with how much work a customer actually pushes through, which is also the signal that they have outgrown the entry tier.",
+        "text": f"**{PRICING['arpu']} per customer per year, blended** — ₹12K of subscription plus credit consumption.\n\nThe number is a **tier mix, not a price**: roughly 80% self-serve at ₹12K and 20% serviced at ₹108K–144K blends to ~₹35K. It moves with how many customers graduate to the serviced tier, not with whether we can push the sticker price up.\n\nThe subscription is predictable and small. The credits are the variable line, and they scale with how much work a customer actually pushes through — which is also the signal that they have outgrown the entry tier.",
     },
     {
         "id": "mo_margin",

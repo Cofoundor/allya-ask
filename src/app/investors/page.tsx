@@ -6,6 +6,7 @@ import { PressButton } from '@/components/Pressable';
 import { ArrowIcon } from '@/components/icons';
 import { RichText } from '@/lib/markdown';
 import type { BrainHandle, BrainOptions, NodeSpec } from '@/lib/brain';
+import { useReducedMotion } from '@/lib/hooks';
 import {
   ApiError,
   getBrain,
@@ -46,7 +47,6 @@ export default function InvestorRoom() {
   useEffect(() => {
     const ac = new AbortController();
     const { signal } = ac;
-
     Promise.all([
       getRoom(signal),
       listSlides({ featured: true, signal }),
@@ -70,7 +70,6 @@ export default function InvestorRoom() {
             : 'Could not load the room.',
         );
       });
-
     return () => ac.abort();
   }, [attempt]);
 
@@ -78,7 +77,7 @@ export default function InvestorRoom() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [slides, setSlides] = useState<Record<string, Slide>>({});
   const [slideError, setSlideError] = useState<string | null>(null);
-  const railRef = useRef<HTMLDivElement>(null);
+  const paneWork = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!openId || slides[openId]) return;
@@ -87,30 +86,35 @@ export default function InvestorRoom() {
       .then((s) => setSlides((prev) => ({ ...prev, [s.id]: s })))
       .catch((err: unknown) => {
         if (ac.signal.aborted) return;
-        setSlideError(err instanceof ApiError && err.status === 404 ? 'That slide is gone.' : 'Could not load that slide.');
+        setSlideError(
+          err instanceof ApiError && err.status === 404 ? 'That slide is gone.' : 'Could not load that slide.',
+        );
       });
     return () => ac.abort();
   }, [openId, slides]);
+
+  const [showWork, setShowWork] = useState(false);
 
   const openSlide = useCallback((id: string | null) => {
     setSlideError(null);
     setOpenId(id);
     if (!id) return;
-    // let the row render before scrolling to it
     requestAnimationFrame(() => {
-      railRef.current?.querySelector<HTMLElement>(`[data-slide="${id}"]`)?.scrollIntoView({
-        block: 'nearest',
-        behavior: 'smooth',
-      });
+      paneWork.current
+        ?.querySelector<HTMLElement>(`[data-slide="${id}"]`)
+        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   }, []);
 
   /* ---------------- the conversation ---------------- */
   const [turns, setTurns] = useState<Turn[]>([]);
   const [asking, setAsking] = useState(false);
+  const [engaged, setEngaged] = useState(false);
   const [draft, setDraft] = useState('');
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const brainRef = useRef<BrainHandle | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLInputElement>(null);
 
   const onBrainReady = useCallback((h: BrainHandle) => {
     brainRef.current = h;
@@ -120,6 +124,9 @@ export default function InvestorRoom() {
     async (question: string, nodeId?: string) => {
       if (asking) return;
       setAsking(true);
+      setEngaged(true);
+      setSuggestOpen(false);
+      setShowWork(false);
       // one targeted thought, not a full bloom — a bloom is ~30 timers and
       // ~70 pulses per answer, which is what made this feel heavy
       brainRef.current?.fireThought(nodeId);
@@ -149,10 +156,22 @@ export default function InvestorRoom() {
 
   // follow the conversation down as it grows
   useEffect(() => {
-    if (!turns.length) return;
+    if (!engaged) return;
     const el = scroller.current;
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-  }, [turns.length, asking]);
+  }, [turns.length, asking, engaged]);
+
+  // ⌘K / Ctrl+K puts the caret in the composer, as it does in the product
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        input.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const onNodeTap = useCallback(
     (node: NodeSpec) => {
@@ -179,19 +198,15 @@ export default function InvestorRoom() {
     };
   }, [brain]);
 
-  /* every question the canvas can be clicked for, for people not using a mouse */
-  const questionList = useMemo(
-    () => (brain?.nodes ?? []).filter((n) => n.tier === 2 && n.question),
-    [brain],
-  );
+  const questionList = useMemo(() => (brain?.nodes ?? []).filter((n) => n.tier === 2 && n.question), [brain]);
 
   /* ---------------- states before the room exists ---------------- */
   if (loadError) {
     return (
-      <div className="iv iv-center">
-        <div className="iv-panel">
+      <div className="room-center">
+        <div className="room-panel">
           <div className="group-label">The room is offline</div>
-          <p className="iv-panel-text">{loadError}</p>
+          <p>{loadError}</p>
           <PressButton type="button" className="cta" onClick={() => setAttempt((n) => n + 1)}>
             Try again
           </PressButton>
@@ -202,311 +217,441 @@ export default function InvestorRoom() {
 
   if (!room || !brainOptions) {
     return (
-      <div className="iv iv-center">
-        <div className="iv-panel">
+      <div className="room-center">
+        <div className="room-panel">
           <span className="spinner" />
-          <p className="iv-panel-text">Waking the brain…</p>
+          <p>Waking the brain…</p>
         </div>
       </div>
     );
   }
 
+  const total = featured.length + rest.length;
+
   return (
-    <div className="iv">
-      <header className="iv-top">
-        <div className="iv-brand">
-          <span className="lamp" />
-          {room.company}
-          <span className="pill">{room.stage}</span>
+    <div className="app">
+      {/* ---------------- topbar ---------------- */}
+      <header className="topbar">
+        <div className="brand">
+          <span className="lamp" /> {room.company} <span className="date">· {room.stage}</span>
         </div>
-        <div className="iv-top-mid">{room.tagline}</div>
-        <div className="iv-top-right">
-          {room.chips.map((c) => (
-            <span key={c.value} className={`iv-ask-chip${c.label ? '' : ' iv-quiet'}`}>
-              <b>{c.value}</b>
-              {c.label ? ` ${c.label}` : null}
-            </span>
-          ))}
+
+        <nav className="tabs" aria-label="Panes">
+          <button type="button" className={`tab${showWork ? '' : ' active'}`} onClick={() => setShowWork(false)}>
+            Ask
+          </button>
+          <button type="button" className={`tab${showWork ? ' active' : ''}`} onClick={() => setShowWork(true)}>
+            Deck <span className="badge">·{total}</span>
+          </button>
+        </nav>
+
+        <div className="spacer" />
+        <div className="status-line">
+          <span className="pulse" />
+          {room.status_line}
         </div>
+        <button type="button" className="kbd" onClick={() => input.current?.focus()} title="Focus the composer">
+          ⌘K
+        </button>
       </header>
 
-      <div className="iv-body">
-        {/* ---------------- the brain ---------------- */}
-        <main className="iv-main">
-          <p className="iv-greet">{room.greeting}</p>
+      <main className={`workspace${showWork ? ' show-work' : ''}`}>
+        {/* ================= the conversation ================= */}
+        <section className={`pane-chat${engaged ? ' engaged' : ''}`} aria-label="Ask Allya">
+          <Island room={room} pointers={pointers} onPointer={openSlide} />
 
-          <div className="iv-brain">
-            <div className="iv-brain-head">
-              <span className="iv-brain-title">
-                <span className="brain-live" /> {room.brain_title}
-              </span>
-              <span className="iv-brain-sub">{room.brain_subtitle}</span>
-            </div>
-            <BrainCanvas
-              className="iv-brain-canvas"
-              options={brainOptions}
-              onReady={onBrainReady}
-              onTap={onNodeTap}
-            />
-          </div>
+          <div className="canvas">
+            <div className="canvas-inner">
+              <p className="canvas-greet">{room.greeting}</p>
 
-          <div className="iv-scroll" ref={scroller}>
-            <div className="iv-row">
-              <section className="iv-card">
-                <div className="group-label">From the deck</div>
-                {pointers.length === 0 ? (
-                  <p className="iv-muted">Nothing pinned yet.</p>
-                ) : (
-                  <div className="iv-pointers">
-                    {pointers.map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        className="iv-pointer"
-                        onClick={() => openSlide(p.slide_id)}
-                      >
-                        <span className="iv-pointer-text">{p.text}</span>
-                        <span className="iv-pointer-slide">{p.slide_id}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </section>
-
-              <section className="iv-card">
-                <div className="group-label">The ask</div>
-                <div className="iv-asks">
-                  {room.metrics.map((m) => (
-                    <div key={m.label} className="iv-askrow">
-                      <b>{m.value}</b>
-                      <span>{m.label}</span>
-                    </div>
-                  ))}
+              <div className="c-sec brain-box">
+                <div className="brain-head">
+                  <span className="brain-title">
+                    <span className="brain-live" /> {room.brain_title}
+                  </span>
+                  <span className="brain-side">
+                    <span className="brain-sub">{room.brain_subtitle}</span>
+                  </span>
                 </div>
-              </section>
-            </div>
+                <BrainCanvas
+                  className="brain-canvas"
+                  options={brainOptions}
+                  onReady={onBrainReady}
+                  onTap={onNodeTap}
+                />
+              </div>
 
-            <div className="iv-thread">
-              {turns.length === 0 && !asking ? (
-                <div className="iv-empty">
-                  <div className="group-label">Start here</div>
-                  <div className="chips">
-                    {room.openers.map((o) => (
-                      <PressButton
-                        key={o.id}
-                        type="button"
-                        className="chip"
-                        pressScale={0.94}
-                        onClick={() => void ask(o.text)}
-                      >
-                        {o.text}
-                      </PressButton>
-                    ))}
+              <div className="c-row">
+                <section className="c-sec learnt">
+                  <div className="group-label">
+                    From the deck <span className="count">{pointers.length}</span>
                   </div>
-
-                  <details className="iv-all-q">
-                    <summary>Or pick from every question in the brain</summary>
-                    <div className="iv-q-list">
-                      {questionList.map((n) => (
+                  {pointers.length === 0 ? (
+                    <p className="kf-empty">Nothing pinned yet.</p>
+                  ) : (
+                    <div className="kf-feed">
+                      {pointers.map((p) => (
                         <button
-                          key={n.id}
+                          key={p.id}
                           type="button"
-                          className="iv-q"
-                          onClick={() => void ask(n.question!, n.id)}
+                          className="kf-row"
+                          onClick={() => {
+                            openSlide(p.slide_id);
+                            setShowWork(true);
+                          }}
                         >
-                          {n.question}
+                          <span className="kf-text">{p.text}</span>
+                          <span className="kf-slide">{p.slide_id}</span>
                         </button>
                       ))}
                     </div>
-                  </details>
-                </div>
-              ) : null}
+                  )}
+                </section>
 
-              {turns.map((t) => (
-                <div key={t.key} className="iv-turn">
-                  <div className="msg from-you">
-                    <div className="msg-block">
-                      <div className="bubble you">{t.question}</div>
+                <section className="c-sec">
+                  <div className="group-label">The ask</div>
+                  {room.metrics.map((m) => (
+                    <div key={m.label} className="day-row">
+                      <span className="dr-time">{m.value}</span>
+                      <span className="dr-what">{m.label}</span>
                     </div>
-                  </div>
-                  <div className="msg change">
-                    <div className="msg-block">
-                      <div className="speaker">Allya</div>
-                      <div className={`bubble allya${t.matched ? '' : ' iv-unmatched'}`}>
-                        <RichText text={t.text} />
-                      </div>
-                      {t.slideId ? (
-                        <div className="msg-tools">
-                          <button type="button" className="tool" onClick={() => openSlide(t.slideId!)}>
-                            Slide {t.slideId} →
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
+                  ))}
+                </section>
+              </div>
+
+              <p className="canvas-hint">Touch the brain, or use the bar below when you want to ask</p>
+            </div>
+          </div>
+
+          <div className="thread-scroll" ref={scroller}>
+            <div className="day-mark">
+              Ask us anything
+              <button type="button" onClick={() => setEngaged(false)}>
+                ← back to the brain
+              </button>
+            </div>
+
+            {turns.map((t) => (
+              <div key={t.key}>
+                <div className="msg from-you">
+                  <div className="msg-block">
+                    <div className="bubble you">{t.question}</div>
                   </div>
                 </div>
-              ))}
-
-              {asking ? (
                 <div className="msg change">
                   <div className="msg-block">
                     <div className="speaker">Allya</div>
-                    <div className="bubble allya typing" aria-label="Allya is answering">
-                      <i />
-                      <i />
-                      <i />
+                    <div className="bubble allya">
+                      <RichText text={t.text} />
                     </div>
+                    {t.slideId ? (
+                      <div className="msg-tools">
+                        <button
+                          type="button"
+                          className="tool"
+                          onClick={() => {
+                            openSlide(t.slideId!);
+                            setShowWork(true);
+                          }}
+                        >
+                          Slide {t.slideId} →
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
-              ) : null}
-            </div>
+              </div>
+            ))}
+
+            {asking ? (
+              <div className="msg change">
+                <div className="msg-block">
+                  <div className="speaker">Allya</div>
+                  <div className="bubble allya typing" aria-label="Allya is answering">
+                    <i />
+                    <i />
+                    <i />
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {turns.length === 0 && !asking ? (
+              <details className="all-q" open>
+                <summary>Every question the brain holds</summary>
+                <div className="q-list">
+                  {questionList.map((n) => (
+                    <button key={n.id} type="button" onClick={() => void ask(n.question!, n.id)}>
+                      {n.question}
+                    </button>
+                  ))}
+                </div>
+              </details>
+            ) : null}
           </div>
 
-          <form
-            className="iv-composer"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const text = draft.trim();
-              if (!text || asking) return;
-              setDraft('');
-              void ask(text);
-            }}
-          >
-            <div className="field">
-              <input
-                type="text"
-                value={draft}
-                disabled={asking}
-                placeholder={room.composer_placeholder}
-                aria-label="Your question"
-                onChange={(e) => setDraft(e.target.value)}
-              />
-              <PressButton className="send" type="submit" disabled={asking || !draft.trim()} aria-label="Ask">
-                <ArrowIcon />
-              </PressButton>
-            </div>
-          </form>
-        </main>
+          {/* ---------------- composer ---------------- */}
+          <div className="composer">
+            {suggestOpen && !draft ? (
+              <div className="suggest">
+                <div className="suggest-label">What investors open with</div>
+                {room.openers.map((o) => (
+                  <button
+                    key={o.id}
+                    type="button"
+                    className="suggest-item"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => void ask(o.text)}
+                  >
+                    {o.text}
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
-        {/* ---------------- the deck, on the right ---------------- */}
-        <aside className="iv-rail" aria-label="The pitch deck">
-          <div className="iv-rail-head">
-            <span className="group-label">The deck</span>
-            <span className="iv-rail-count">{featured.length + rest.length} slides</span>
-          </div>
-
-          <div className="iv-rail-list" ref={railRef}>
-            {slideError ? <p className="iv-muted iv-rail-error">{slideError}</p> : null}
-
-            <div className="iv-rail-group">
-              <div className="group-label iv-group-key">Key slides</div>
-              {featured.map((s) => (
-                <SlideCard
-                  key={s.id}
-                  summary={s}
-                  full={slides[s.id]}
-                  open={openId === s.id}
-                  showcase
-                  onToggle={() => openSlide(openId === s.id ? null : s.id)}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const text = draft.trim();
+                if (!text || asking) return;
+                setDraft('');
+                void ask(text);
+              }}
+            >
+              <div className="field">
+                <input
+                  ref={input}
+                  type="text"
+                  value={draft}
+                  disabled={asking}
+                  placeholder={room.composer_placeholder}
+                  aria-label="Your question"
+                  onChange={(e) => setDraft(e.target.value)}
+                  onFocus={() => setSuggestOpen(true)}
+                  onBlur={() => setSuggestOpen(false)}
                 />
-              ))}
-            </div>
-
-            <div className="iv-rail-group">
-              <div className="group-label">Everything else</div>
-              {rest.map((s) => (
-                <SlideCard
-                  key={s.id}
-                  summary={s}
-                  full={slides[s.id]}
-                  open={openId === s.id}
-                  onToggle={() => openSlide(openId === s.id ? null : s.id)}
-                />
-              ))}
-            </div>
+                <PressButton className="send" type="submit" disabled={asking || !draft.trim()} aria-label="Ask">
+                  <ArrowIcon />
+                </PressButton>
+              </div>
+            </form>
           </div>
+        </section>
+
+        {/* ================= the deck ================= */}
+        <aside className="pane-work" ref={paneWork} aria-label="The pitch deck">
+          <div className="work-head">
+            <h2>The deck</h2>
+            <span className="split-note">
+              <b>{featured.length}</b> key · <b>{total}</b> slides
+            </span>
+          </div>
+
+          {slideError ? <p className="kf-empty">{slideError}</p> : null}
+
+          <div className="group-label">
+            Key slides <span className="count">{featured.length}</span>
+          </div>
+          {featured.map((s) => (
+            <div key={s.id} data-slide={s.id}>
+              <button
+                type="button"
+                className={`slide-card${openId === s.id ? ' is-open' : ''}`}
+                aria-expanded={openId === s.id}
+                onClick={() => openSlide(openId === s.id ? null : s.id)}
+              >
+                <div className="who">
+                  <span className="n">{s.id}</span>
+                  <span className="name">
+                    {s.label}
+                    {/* several slides use the label as their kicker — don't say it twice */}
+                    {s.kicker && s.kicker !== s.label ? <span className="role"> · {s.kicker}</span> : null}
+                  </span>
+                </div>
+                <p className="say">{s.headline}</p>
+                {s.feature_note ? <p className="note">{s.feature_note}</p> : null}
+                {s.stats.length ? (
+                  <div className="slide-stats">
+                    {s.stats.map((st) => (
+                      <div key={st.label} className="slide-stat">
+                        <b>{st.value}</b>
+                        <span>{st.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </button>
+              {openId === s.id ? <SlideBody full={slides[s.id]} hideHeadline /> : null}
+            </div>
+          ))}
+
+          <div className="group-label">
+            Everything else <span className="count">{rest.length}</span>
+          </div>
+          {rest.map((s) => (
+            <div key={s.id} data-slide={s.id}>
+              <button
+                type="button"
+                className={`work-row${openId === s.id ? ' is-open' : ''}`}
+                aria-expanded={openId === s.id}
+                onClick={() => openSlide(openId === s.id ? null : s.id)}
+              >
+                <span className="pill">{s.id}</span>
+                <span className="w-copy">
+                  <span className="t">{s.label}</span>
+                  <span className="s">{s.kicker}</span>
+                </span>
+              </button>
+              {openId === s.id ? <SlideBody full={slides[s.id]} /> : null}
+            </div>
+          ))}
         </aside>
-      </div>
+      </main>
     </div>
   );
 }
 
 /* ============================================================
-   One slide in the rail. Featured slides lead with their headline and
-   numbers even while collapsed — that is the showcase. The rest are a
-   plain index. Full contents arrive on demand.
+   The opened slide's contents. Summaries arrive with the list; the body
+   is fetched on open and cached, so this renders a spinner once per slide.
    ============================================================ */
-function SlideCard({
-  summary,
-  full,
-  open,
-  showcase,
-  onToggle,
-}: {
-  summary: SlideSummary;
-  full?: Slide;
-  open: boolean;
-  showcase?: boolean;
-  onToggle: () => void;
-}) {
+function SlideBody({ full, hideHeadline }: { full?: Slide; hideHeadline?: boolean }) {
+  if (!full) {
+    return (
+      <div className="slide-body slide-loading">
+        <span className="spinner" />
+      </div>
+    );
+  }
   return (
-    <div
-      className={`iv-slide${open ? ' is-open' : ''}${showcase ? ' is-showcase' : ''}`}
-      data-slide={summary.id}
-    >
-      <button type="button" className="iv-slide-btn" aria-expanded={open} onClick={onToggle}>
-        <span className="iv-slide-n">{summary.id}</span>
-        <span className="iv-slide-label">{summary.label}</span>
-      </button>
+    <div className="slide-body">
+      {!hideHeadline ? <div className="slide-kicker">{full.kicker}</div> : null}
+      <ul className="slide-lines">
+        {full.lines.map((l, i) => (
+          <li key={i}>{l}</li>
+        ))}
+      </ul>
+      {full.say ? <p className="slide-say">{full.say}</p> : null}
+    </div>
+  );
+}
 
-      {showcase ? (
-        <div className="iv-showcase" onClick={onToggle} role="presentation">
-          <h3 className="iv-headline">{summary.headline}</h3>
-          {summary.feature_note ? <p className="iv-feature-note">{summary.feature_note}</p> : null}
-          {summary.stats.length ? (
-            <div className="iv-stats">
-              {summary.stats.map((st) => (
-                <div key={st.label} className="iv-stat">
-                  <b>{st.value}</b>
-                  <span>{st.label}</span>
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+/* ============================================================
+   The dynamic island — the product's split pill. Left half steps through
+   the numbers; right half runs the deck past continuously. Expanding is a
+   transition on the same element, not a popup.
 
-      {open ? (
-        full ? (
-          <div className="iv-slide-body">
-            <div className="iv-kicker">{full.kicker}</div>
-            {!showcase ? <h3 className="iv-headline">{full.headline}</h3> : null}
+   Both tickers are CSS transforms, so they run on the compositor and cost
+   no per-frame JavaScript.
+   ============================================================ */
+function Island({
+  room,
+  pointers,
+  onPointer,
+}: {
+  room: Room;
+  pointers: Pointer[];
+  onPointer: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [idx, setIdx] = useState(0);
+  const track = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
 
-            {!showcase && full.stats.length ? (
-              <div className="iv-stats">
-                {full.stats.map((st) => (
-                  <div key={st.label} className="iv-stat">
-                    <b>{st.value}</b>
-                    <span>{st.label}</span>
+  const kpis = room.metrics;
+
+  // step one KPI at a time, wrapping through a trailing clone
+  useEffect(() => {
+    if (reduced || kpis.length < 2) return;
+    // the extra step lands on the trailing clone; the one after snaps home
+    const iv = setInterval(() => setIdx((n) => (n + 1) % (kpis.length + 1)), 3200);
+    return () => clearInterval(iv);
+  }, [reduced, kpis.length]);
+
+  // drive the step with a transform. Coming off the clone back to 0 is the
+  // one move that must not animate, or the strip slides backwards.
+  const prev = useRef(0);
+  useEffect(() => {
+    const el = track.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    const snap = idx === 0 && prev.current === kpis.length;
+    el.style.transition = snap ? 'none' : 'transform 500ms var(--spring)';
+    el.style.transform = `translateX(-${idx * w}px)`;
+    prev.current = idx;
+  }, [idx, kpis.length]);
+
+  // the running strip: measure one copy, then let CSS loop it
+  useEffect(() => {
+    const el = list.current;
+    if (!el) return;
+    const w = el.scrollWidth / 2;
+    if (!w) return;
+    el.style.setProperty('--loop', `-${w}px`);
+    el.style.animation = reduced ? 'none' : `todo-scroll ${w / 34}s linear infinite`;
+  }, [pointers, reduced]);
+
+  const strip = pointers.length ? pointers : [{ id: 'x', text: 'The deck is loading', slide_id: '01' }];
+
+  return (
+    <div className="island-wrap">
+      <div className={`island${open ? ' is-open' : ''}`} aria-expanded={open}>
+        <div className="isl-row">
+          <div className="isl-cell isl-kpi" onClick={() => setOpen((v) => !v)} role="presentation">
+            <span className="isl-dot" />
+            <div className="kpi-track">
+              <div className="kpi-rail" ref={track}>
+                {[...kpis, kpis[0]].filter(Boolean).map((k, i) => (
+                  <div key={i} className="kpi-item" style={{ transform: `translateX(${i * 100}%)` }}>
+                    <span>
+                      <b>{k.value}</b> {k.label}
+                    </span>
                   </div>
                 ))}
               </div>
-            ) : null}
-
-            <ul className="iv-lines">
-              {full.lines.map((l, i) => (
-                <li key={i}>{l}</li>
-              ))}
-            </ul>
-
-            {full.say ? <p className="iv-say">{full.say}</p> : null}
+            </div>
           </div>
-        ) : (
-          <div className="iv-slide-body iv-slide-loading">
-            <span className="spinner" />
+
+          <button type="button" className="isl-cell isl-todo" onClick={() => setOpen((v) => !v)} aria-label="Expand">
+            <span className="todo-tag">deck</span>
+            <div className="todo-track">
+              <div className="todo-list" ref={list}>
+                {[...strip, ...strip].map((p, i) => (
+                  <div key={i} className="todo-item">
+                    <span className={`td-dot${i % 3 === 0 ? ' needs' : ''}`} />
+                    {p.text}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <div className="island-detail">
+          <div className="idet-pane idet-left">
+            <div className="idet-group">The ask</div>
+            {kpis.map((k) => (
+              <div key={k.label} className="idet-kpi">
+                <b>{k.value}</b>
+                {k.label}
+              </div>
+            ))}
           </div>
-        )
-      ) : null}
+          <div className="idet-pane">
+            <div className="idet-group">From the deck</div>
+            {pointers.map((p) => (
+              <button key={p.id} type="button" className="idet-row" onClick={() => onPointer(p.slide_id)}>
+                <span className="td-dot needs" />
+                <span className="idet-copy">
+                  <span className="idet-t">{p.text}</span>
+                </span>
+                <span className="pill">{p.slide_id}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

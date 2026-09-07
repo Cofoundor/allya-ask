@@ -71,6 +71,8 @@ class Room(BaseModel):
     brain_title: str
     brain_subtitle: str
     composer_placeholder: str
+    """the topbar's live line, the way the product shows agents running"""
+    status_line: str
     chips: list[Stat]
     metrics: list[Stat]
     openers: list[Opener]

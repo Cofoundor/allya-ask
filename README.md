@@ -14,10 +14,19 @@ Two pages, in order:
 | Route | What it is |
 |---|---|
 | `/` | **The login.** Email gate → account creation → sign-in. On success it hands over to the room. |
-| `/investors` | **The investor room.** The brain in the middle carrying the questions investors actually ask; the pitch deck in a rail on the right. |
+| `/investors` | **The investor room.** The product's workspace, with the deck in it. |
 
 `/investors` is the page slide 16 of the deck promises — *"here's a dedicated chatbot you can grill
 before you grill us."*
+
+It deliberately **wears the product's workspace**. The shell, the dynamic island, the canvas, the
+brain box and the right-hand panel are ported from `product/styles.css` — the app live at
+allyafn.netlify.app — so an investor who sees the product and then sees this reads them as one
+tool. Same 46px topbar, same 1240px centred split, same `clamp(260px, 46vh, 480px)` brain. The
+only difference is what is in the panels: where the product shows work, this shows the deck.
+
+The chat behaves the same way too: the canvas is what you see until you ask something, then the
+thread replaces it, and **← back to the brain** returns.
 
 ## Stack
 
@@ -117,11 +126,23 @@ happening and ~15fps for the idle drift, so at rest it costs almost nothing.
 A canvas is not reachable by keyboard, so every question it holds is also listed under
 **"Or pick from every question in the brain"** — same questions, same handler.
 
-### The deck rail
+### The deck panel
 
-Slides arrive as summaries; the full contents are fetched when one is opened, then cached.
-**Key slides** lead with their headline and numbers while still collapsed — that is the showcase —
-and the rest are a plain index below. Only one slide is open at a time, so nothing renders twice.
+Where the product puts work, this puts the deck. **Key slides** get the lime-lit card the product
+gives "Needs you" — headline, why it matters and its numbers, visible without opening it. The rest
+are the product's dense work rows. Slides arrive as summaries; bodies are fetched on open and
+cached, and only one is open at a time.
+
+### The island
+
+The product's split pill, with the same two motions: the left half steps through the numbers one
+at a time, the right half runs the deck past continuously. Both are CSS transforms, so they cost
+no per-frame JavaScript. Tapping either half expands the same element into the full list.
+
+Note the clipping subtlety, which is a real bug in the product's own version: the element that
+moves must not be the one that owns `overflow: hidden`, or the clipping window travels with the
+content and the item that lands in view is clipped away. Here a static `.kpi-track` clips and an
+inner `.kpi-rail` slides.
 
 ### Allya speaks in serif
 
