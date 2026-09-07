@@ -22,6 +22,8 @@ export interface SlideSummary {
   headline: string;
   featured: boolean;
   feature_note?: string | null;
+  /** deep link straight to this slide in the deck itself */
+  deck_url: string;
   /** headline numbers — a card shows these without fetching the whole slide */
   stats: Stat[];
 }
@@ -63,6 +65,23 @@ export interface Opener {
   text: string;
 }
 
+/** A box on the page, with the line it introduces itself by. */
+export interface Panel {
+  id: string;
+  title: string;
+  blurb: string;
+}
+
+/** The choice offered on arrival: read the deck, or start asking. */
+export interface Intro {
+  title: string;
+  body: string;
+  deck_cta: string;
+  deck_note: string;
+  ask_cta: string;
+  ask_note: string;
+}
+
 /** A document the room hands out. An empty url means "not ready to share". */
 export interface Link {
   id: string;
@@ -85,6 +104,8 @@ export interface Room {
   metrics: Stat[];
   openers: Opener[];
   links: Link[];
+  panels: Panel[];
+  intro: Intro;
   no_answer_text: string;
 }
 

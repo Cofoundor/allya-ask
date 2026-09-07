@@ -16,6 +16,7 @@ import {
   listSlides,
   postAnswer,
   type BrainGraph,
+  type Panel,
   type Pointer,
   type Room,
   type Slide,
@@ -112,6 +113,14 @@ export default function InvestorRoom() {
   const [engaged, setEngaged] = useState(false);
   const [draft, setDraft] = useState('');
   const [suggestOpen, setSuggestOpen] = useState(false);
+  const [introDone, setIntroDone] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    try {
+      return sessionStorage.getItem('allya-room-intro') === 'done';
+    } catch {
+      return false;
+    }
+  });
   const brainRef = useRef<BrainHandle | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
@@ -161,6 +170,15 @@ export default function InvestorRoom() {
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
   }, [turns.length, asking, engaged]);
 
+  const dismissIntro = useCallback(() => {
+    setIntroDone(true);
+    try {
+      sessionStorage.setItem('allya-room-intro', 'done');
+    } catch {
+      // private window, or site data blocked — the choice just isn't remembered
+    }
+  }, []);
+
   // ⌘K / Ctrl+K puts the caret in the composer, as it does in the product
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -168,10 +186,12 @@ export default function InvestorRoom() {
         e.preventDefault();
         input.current?.focus();
       }
+      if (e.key === 'Escape') dismissIntro();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [dismissIntro]);
+
 
   const onNodeTap = useCallback(
     (node: NodeSpec) => {
@@ -227,14 +247,66 @@ export default function InvestorRoom() {
   }
 
   const total = featured.length + rest.length;
+  const panelOf = (id: string): Panel | undefined => room.panels.find((p) => p.id === id);
+  const deckLink = room.links.find((l) => l.id === 'deck' && l.url);
 
   return (
     <div className="app">
+      {!introDone ? (
+        <div className="intro-scrim" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+          <div className="intro-card">
+            <div className="intro-mark">
+              <span className="lamp" /> {room.company}
+            </div>
+            <h2 id="intro-title">{room.intro.title}</h2>
+            <p className="intro-body">{room.intro.body}</p>
+
+            <div className="intro-choices">
+              {deckLink ? (
+                <a
+                  className="intro-choice"
+                  href={deckLink.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    dismissIntro();
+                    setShowWork(true);
+                  }}
+                >
+                  <b>{room.intro.deck_cta}</b>
+                  <span>{room.intro.deck_note}</span>
+                </a>
+              ) : null}
+
+              <button
+                type="button"
+                className="intro-choice is-ask"
+                autoFocus
+                onClick={() => {
+                  dismissIntro();
+                  input.current?.focus();
+                }}
+              >
+                <b>{room.intro.ask_cta}</b>
+                <span>{room.intro.ask_note}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {/* ---------------- topbar ---------------- */}
       <header className="topbar">
         <div className="brand">
           <span className="lamp" /> {room.company} <span className="date">· {room.stage}</span>
         </div>
+
+        {/* the second way to the deck — the first is each slide's own link */}
+        {deckLink ? (
+          <a className="deck-btn" href={deckLink.url} target="_blank" rel="noopener noreferrer">
+            The deck <span className="deck-btn-n">{total}</span> ↗
+          </a>
+        ) : null}
 
         <nav className="tabs" aria-label="Panes">
           <button type="button" className={`tab${showWork ? '' : ' active'}`} onClick={() => setShowWork(false)}>
@@ -250,10 +322,10 @@ export default function InvestorRoom() {
           <span className="pulse" />
           {room.status_line}
         </div>
-        {/* the documents the room hands out — a blank url is left out rather
-            than shipped as a link that 404s in front of an investor */}
+        {/* the other documents — the deck has its own button on the left, and a
+            blank url is left out rather than shipped as a link that 404s */}
         {room.links
-          .filter((l) => l.url)
+          .filter((l) => l.url && l.id !== 'deck')
           .map((l) => (
             <a
               key={l.id}
@@ -301,8 +373,9 @@ export default function InvestorRoom() {
               <div className="c-row">
                 <section className="c-sec learnt">
                   <div className="group-label">
-                    From the deck <span className="count">{pointers.length}</span>
+                    {panelOf('pointers')?.title} <span className="count">{pointers.length}</span>
                   </div>
+                  <p className="c-blurb">{panelOf('pointers')?.blurb}</p>
                   {pointers.length === 0 ? (
                     <p className="kf-empty">Nothing pinned yet.</p>
                   ) : (
@@ -326,7 +399,8 @@ export default function InvestorRoom() {
                 </section>
 
                 <section className="c-sec">
-                  <div className="group-label">The ask</div>
+                  <div className="group-label">{panelOf('ask')?.title}</div>
+                  <p className="c-blurb">{panelOf('ask')?.blurb}</p>
                   {room.metrics.map((m) => (
                     <div key={m.label} className="day-row">
                       <span className="dr-time">{m.value}</span>
@@ -458,17 +532,19 @@ export default function InvestorRoom() {
         {/* ================= the deck ================= */}
         <aside className="pane-work" ref={paneWork} aria-label="The pitch deck">
           <div className="work-head">
-            <h2>The deck</h2>
+            <h2>{panelOf('deck')?.title}</h2>
             <span className="split-note">
               <b>{featured.length}</b> key · <b>{total}</b> slides
             </span>
           </div>
+          <p className="c-blurb work-blurb">{panelOf('deck')?.blurb}</p>
 
           {slideError ? <p className="kf-empty">{slideError}</p> : null}
 
           <div className="group-label">
-            Key slides <span className="count">{featured.length}</span>
+            {panelOf('key')?.title} <span className="count">{featured.length}</span>
           </div>
+          <p className="c-blurb">{panelOf('key')?.blurb}</p>
           {featured.map((s) => (
             <div key={s.id} data-slide={s.id}>
               <button
@@ -498,13 +574,16 @@ export default function InvestorRoom() {
                   </div>
                 ) : null}
               </button>
-              {openId === s.id ? <SlideBody full={slides[s.id]} hideHeadline /> : null}
+              {openId === s.id ? (
+                <SlideBody full={slides[s.id]} hideHeadline deckUrl={s.deck_url} label={s.label} />
+              ) : null}
             </div>
           ))}
 
           <div className="group-label">
-            Everything else <span className="count">{rest.length}</span>
+            {panelOf('rest')?.title} <span className="count">{rest.length}</span>
           </div>
+          <p className="c-blurb">{panelOf('rest')?.blurb}</p>
           {rest.map((s) => (
             <div key={s.id} data-slide={s.id}>
               <button
@@ -519,7 +598,7 @@ export default function InvestorRoom() {
                   <span className="s">{s.kicker}</span>
                 </span>
               </button>
-              {openId === s.id ? <SlideBody full={slides[s.id]} /> : null}
+              {openId === s.id ? <SlideBody full={slides[s.id]} deckUrl={s.deck_url} label={s.label} /> : null}
             </div>
           ))}
         </aside>
@@ -532,7 +611,17 @@ export default function InvestorRoom() {
    The opened slide's contents. Summaries arrive with the list; the body
    is fetched on open and cached, so this renders a spinner once per slide.
    ============================================================ */
-function SlideBody({ full, hideHeadline }: { full?: Slide; hideHeadline?: boolean }) {
+function SlideBody({
+  full,
+  hideHeadline,
+  deckUrl,
+  label,
+}: {
+  full?: Slide;
+  hideHeadline?: boolean;
+  deckUrl: string;
+  label: string;
+}) {
   if (!full) {
     return (
       <div className="slide-body slide-loading">
@@ -549,6 +638,10 @@ function SlideBody({ full, hideHeadline }: { full?: Slide; hideHeadline?: boolea
         ))}
       </ul>
       {full.say ? <p className="slide-say">{full.say}</p> : null}
+      {/* the deck deep-links by slide, so this lands on the real thing */}
+      <a className="slide-open" href={deckUrl} target="_blank" rel="noopener noreferrer">
+        Open “{label}” in the deck ↗
+      </a>
     </div>
   );
 }

@@ -19,6 +19,8 @@ class SlideSummary(BaseModel):
     headline: str
     featured: bool
     feature_note: str | None = None
+    """deep link straight to this slide in the deck itself"""
+    deck_url: str = ""
     """headline numbers — a card shows these without fetching the whole slide"""
     stats: list[Stat] = []
 
@@ -63,6 +65,23 @@ class Opener(BaseModel):
     text: str
 
 
+class Panel(BaseModel):
+    """A box on the page, with the line it introduces itself by."""
+    id: str
+    title: str
+    blurb: str
+
+
+class Intro(BaseModel):
+    """The choice offered on arrival: read the deck, or start asking."""
+    title: str
+    body: str
+    deck_cta: str
+    deck_note: str
+    ask_cta: str
+    ask_note: str
+
+
 class Link(BaseModel):
     """A document the room hands out. An empty url means it is not ready to
     share yet, and the client leaves it out rather than shipping a dead link."""
@@ -86,6 +105,8 @@ class Room(BaseModel):
     metrics: list[Stat]
     openers: list[Opener]
     links: list[Link]
+    panels: list[Panel]
+    intro: Intro
     """shown when a question matches nothing — copy belongs to the backend"""
     no_answer_text: str
 

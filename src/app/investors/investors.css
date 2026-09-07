@@ -530,3 +530,118 @@
   .c-row { flex-direction: column; }
   .msg-block { max-width: 92%; }
 }
+
+/* ============================================================
+   The deck, reachable from three places
+   ============================================================ */
+
+/* top-left, beside the brand — the standing way in */
+.deck-btn {
+  flex: none;
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11.5px; font-weight: 500;
+  color: var(--lime); text-decoration: none;
+  border: 1px solid rgba(145, 212, 95, 0.35);
+  border-radius: 999px;
+  padding: 3px 10px;
+  background: rgba(145, 212, 95, 0.08);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.deck-btn:hover { background: rgba(145, 212, 95, 0.16); border-color: rgba(145, 212, 95, 0.6); }
+.deck-btn-n {
+  font-size: 10px; font-variant-numeric: tabular-nums;
+  color: var(--on-lime); background: var(--lime);
+  border-radius: 999px; padding: 0 5px;
+}
+
+/* and from the foot of every opened slide */
+.slide-open {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 11.5px; font-weight: 500;
+  color: var(--lime-glow); text-decoration: none;
+  border-bottom: 1px solid rgba(145, 212, 95, 0.3);
+  padding-bottom: 1px;
+}
+.slide-open:hover { border-bottom-color: var(--lime); }
+
+/* ============================================================
+   Each box says what it is, in its own voice
+   ============================================================ */
+.c-blurb {
+  margin: -4px 0 11px;
+  font-family: var(--serif); font-optical-sizing: auto;
+  font-weight: 420; font-size: 12.5px; line-height: 1.5;
+  color: var(--fg-faint);
+}
+.work-blurb { margin: 2px 0 4px; }
+
+/* ============================================================
+   The arrival choice — deck first, or straight to questions
+   ============================================================ */
+.intro-scrim {
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  padding: 24px;
+  background: rgba(6, 6, 6, 0.82);
+  backdrop-filter: blur(6px);
+  animation: intro-fade 240ms var(--ease) both;
+}
+@keyframes intro-fade { from { opacity: 0 } to { opacity: 1 } }
+
+.intro-card {
+  width: 100%; max-width: 520px;
+  background: var(--card);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 18px;
+  padding: 26px 28px 24px;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.95);
+  animation: intro-rise 380ms var(--spring) both;
+}
+@keyframes intro-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+.intro-mark {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12.5px; font-weight: 500; color: var(--fg-soft);
+  margin-bottom: 16px;
+}
+.intro-card h2 {
+  margin: 0 0 10px;
+  font-family: var(--serif); font-optical-sizing: auto;
+  font-weight: 460; font-size: 24px; line-height: 1.2;
+  letter-spacing: -0.015em; color: var(--fg);
+}
+.intro-body {
+  margin: 0 0 22px;
+  font-size: 13.5px; line-height: 1.6; color: var(--fg-soft);
+}
+
+.intro-choices { display: grid; gap: 10px; }
+.intro-choice {
+  appearance: none; cursor: pointer;
+  display: grid; gap: 3px;
+  text-align: left; text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.intro-choice:hover { background: var(--raised); border-color: rgba(145, 212, 95, 0.5); }
+.intro-choice b { font-size: 14px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em; }
+.intro-choice span { font-size: 11.5px; color: var(--fg-faint); }
+/* the room's own path is the accented one */
+.intro-choice.is-ask {
+  background: rgba(145, 212, 95, 0.06);
+  border-color: rgba(145, 212, 95, 0.45);
+}
+.intro-choice.is-ask:hover { background: rgba(145, 212, 95, 0.12); border-color: var(--lime); }
+.intro-choice.is-ask b { color: var(--lime-glow); }
+
+@media (max-width: 860px) {
+  .deck-btn-n { display: none; }
+  .intro-card { padding: 22px 20px 20px; }
+  .intro-card h2 { font-size: 20px; }
+}

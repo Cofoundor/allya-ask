@@ -11,6 +11,10 @@ PRICING is the single source for the commercial model. The deck still prints
 Rs 2,000/mo; pricing was re-settled on 2 Sep 2026 at Rs 1,000/mo plus credits.
 """
 
+# Where the bundled deck is served from. It deep-links by slide with a
+# 1-indexed "#n" hash, which is how each slide in the rail reaches its own page.
+DECK_URL = "/pitch-deck.html"
+
 PRICING = {
     "platform": "₹1,000",
     "credit_rate": "1 credit = ₹10",
@@ -46,13 +50,52 @@ ROOM = {
         {"id": "o3", "text": "What happens to the human 15% at scale?"},
         {"id": "o4", "text": "What does ₹4 Cr get you to?"},
     ],
+    # Each box says what it is in its own voice, rather than wearing a bare label.
+    "panels": [
+        {
+            "id": "pointers",
+            "title": "From the deck",
+            "blurb": "Twelve claims you can check. Tap one and I'll open the slide it came from.",
+        },
+        {
+            "id": "ask",
+            "title": "The ask",
+            "blurb": "₹4 Cr for 7%. The shape of it, before you have to ask for the shape of it.",
+        },
+        {
+            "id": "deck",
+            "title": "The deck",
+            "blurb": "Sixteen slides. Open one here, or send it to the deck itself.",
+        },
+        {
+            "id": "key",
+            "title": "Key slides",
+            "blurb": "If you only open five, open these.",
+        },
+        {
+            "id": "rest",
+            "title": "Everything else",
+            "blurb": "The rest of the story, in the order we'd tell it.",
+        },
+    ],
+    "intro": {
+        "title": "Deck first, or straight to questions?",
+        "body": (
+            "Both work, and you can switch at any point. The deck is the sixteen slides we would "
+            "walk you through. The brain answers the things you would interrupt us with."
+        ),
+        "deck_cta": "Show me the deck",
+        "deck_note": "16 slides · about six minutes",
+        "ask_cta": "I'll ask my own questions",
+        "ask_note": "27 of them are already answered",
+    },
     # Documents the room hands out. A blank url is not rendered — better no
     # link than one that 404s in front of an investor.
     "links": [
         {
             "id": "deck",
             "label": "Pitch deck",
-            "url": "/pitch-deck.html",
+            "url": DECK_URL,
             "note": "The full 16-slide deck",
         },
         {

@@ -118,6 +118,11 @@ def get_room() -> Room:
     return Room(**data.ROOM)
 
 
+def _deck_url(slide_id: str) -> str:
+    """The deck deep-links by 1-indexed hash, and slide ids are already that."""
+    return f"{data.DECK_URL}#{int(slide_id)}"
+
+
 @app.get("/api/investor/slides", response_model=list[SlideSummary])
 def list_slides(
     featured: bool | None = Query(None, description="only the slides worth leading with"),
@@ -125,14 +130,14 @@ def list_slides(
     slides = data.SLIDES
     if featured is not None:
         slides = [s for s in slides if s.get("featured", False) is featured]
-    return [SlideSummary(**s) for s in slides]
+    return [SlideSummary(**s, deck_url=_deck_url(s["id"])) for s in slides]
 
 
 @app.get("/api/investor/slides/{slide_id}", response_model=Slide)
 def get_slide(slide_id: str) -> Slide:
     for s in data.SLIDES:
         if s["id"] == slide_id:
-            return Slide(**s)
+            return Slide(**s, deck_url=_deck_url(s["id"]))
     raise HTTPException(status_code=404, detail=f"No slide {slide_id}")
 
 
