@@ -63,6 +63,15 @@ class Opener(BaseModel):
     text: str
 
 
+class Link(BaseModel):
+    """A document the room hands out. An empty url means it is not ready to
+    share yet, and the client leaves it out rather than shipping a dead link."""
+    id: str
+    label: str
+    url: str
+    note: str | None = None
+
+
 class Room(BaseModel):
     company: str
     stage: str
@@ -76,6 +85,7 @@ class Room(BaseModel):
     chips: list[Stat]
     metrics: list[Stat]
     openers: list[Opener]
+    links: list[Link]
     """shown when a question matches nothing — copy belongs to the backend"""
     no_answer_text: str
 

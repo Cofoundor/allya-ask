@@ -88,6 +88,28 @@ talks to it.
 No auth, no database, no ORM, no caching, no background jobs, no CRUD it does not need. In-memory
 content, six endpoints, every one of them consumed by the page.
 
+## The documents the room hands out
+
+`GET /api/investor/room` returns a `links` list — the deck, the brand wiki, anything else worth
+handing an investor. **A blank `url` is not rendered**, so a document that is not ready to share
+never becomes a dead link in the topbar.
+
+- **Pitch deck** → `/pitch-deck.html`. The file is served from `public/` but **deliberately not
+  committed** — this repo is public. Copy `Zeroto10 Pitch Deck (shareable).html` into
+  `public/pitch-deck.html` to serve it; without it the link 404s.
+- **Brand wiki** → url is empty. `Cofoundor/brand-wiki` is private and its Azure default hostname
+  (`lemon-flower-053e11700.azurestaticapps.net`) 404s, so there is no working public link yet.
+  Fill the url in `backend/data.py` and the link appears by itself.
+
+> ### ⚠️ The deck leaks its own review notes
+>
+> Verified by rendering it: the authoring tool's `<sc-if value="{{ showAsks }}">` blocks **are
+> visible**. 23 internal notes across 14 of the 16 slides — "ASK — any real ₹ collected or
+> invoiced", "Needs Sanshat: replace this top-down funnel", "Contradiction: deck says both first
+> month free and no free tier" — render in green on the slides themselves.
+>
+> Anyone given this link reads the gap list. Strip those blocks before sharing.
+
 ## Two things to know about the content
 
 - **`needs_founder: True`** in `backend/data.py` marks answers resting on a figure the deck itself

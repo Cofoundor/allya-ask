@@ -14,3 +14,8 @@ next-env.d.ts
 npm-debug.log*
 yarn-error.log*
 .vercel
+
+# The pitch deck is served from /pitch-deck.html but deliberately NOT committed:
+# this repo is public, and the deck carries the valuation, named clients and the
+# authoring tool's internal "ASK" notes. Drop the file in public/ to serve it.
+public/pitch-deck.html

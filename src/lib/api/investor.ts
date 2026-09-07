@@ -63,6 +63,14 @@ export interface Opener {
   text: string;
 }
 
+/** A document the room hands out. An empty url means "not ready to share". */
+export interface Link {
+  id: string;
+  label: string;
+  url: string;
+  note?: string | null;
+}
+
 export interface Room {
   company: string;
   stage: string;
@@ -76,6 +84,7 @@ export interface Room {
   chips: Stat[];
   metrics: Stat[];
   openers: Opener[];
+  links: Link[];
   no_answer_text: string;
 }
 

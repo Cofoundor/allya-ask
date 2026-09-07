@@ -250,6 +250,23 @@ export default function InvestorRoom() {
           <span className="pulse" />
           {room.status_line}
         </div>
+        {/* the documents the room hands out — a blank url is left out rather
+            than shipped as a link that 404s in front of an investor */}
+        {room.links
+          .filter((l) => l.url)
+          .map((l) => (
+            <a
+              key={l.id}
+              className="kbd"
+              href={l.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={l.note ?? l.label}
+            >
+              {l.label} ↗
+            </a>
+          ))}
+
         <button type="button" className="kbd" onClick={() => input.current?.focus()} title="Focus the composer">
           ⌘K
         </button>

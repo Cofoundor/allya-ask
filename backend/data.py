@@ -46,6 +46,25 @@ ROOM = {
         {"id": "o3", "text": "What happens to the human 15% at scale?"},
         {"id": "o4", "text": "What does ₹4 Cr get you to?"},
     ],
+    # Documents the room hands out. A blank url is not rendered — better no
+    # link than one that 404s in front of an investor.
+    "links": [
+        {
+            "id": "deck",
+            "label": "Pitch deck",
+            "url": "/pitch-deck.html",
+            "note": "The full 16-slide deck",
+        },
+        {
+            "id": "wiki",
+            "label": "Brand wiki",
+            # No working public hostname yet: the repo is private and the Azure
+            # default lemon-flower-053e11700.azurestaticapps.net 404s. Fill this
+            # in and the link appears by itself.
+            "url": "",
+            "note": "Voice, positioning, proof, ICP",
+        },
+    ],
     "no_answer_text": (
         "That one is not in the brain yet — this room answers the questions the deck can back "
         "with a number or a source, and makes no attempt to bluff the rest.\n\n"
